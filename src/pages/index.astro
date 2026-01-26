@@ -59,7 +59,7 @@ import '../styles/global.css';
         window.matchMedia &&
         window.matchMedia('(prefers-color-scheme: dark)').matches
       ) {
-        document.documentElement.classList.add('dark-theme');
+        document.documentElement.classList.add('dark');
       }
 
       // Listen for system theme changes
@@ -67,9 +67,9 @@ import '../styles/global.css';
         .matchMedia('(prefers-color-scheme: dark)')
         .addEventListener('change', (e) => {
           if (e.matches) {
-            document.documentElement.classList.add('dark-theme');
+            document.documentElement.classList.add('dark');
           } else {
-            document.documentElement.classList.remove('dark-theme');
+            document.documentElement.classList.remove('dark');
           }
         });
     </script>
@@ -84,86 +84,87 @@ import '../styles/global.css';
       rel="stylesheet"
     />
   </head>
-  <body>
-    <div class="container">
-      <div class="header">
-        <h1>World Clock</h1>
-        <div class="format-toggle">
-          <button class="time-format-btn active" data-format="24">24H</button>
-          <button class="time-format-btn" data-format="12">12H</button>
+  <body class="min-h-screen flex items-start justify-center bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-50 transition-colors duration-300 py-8">
+    <div class="w-full max-w-7xl px-8 md:px-4">
+      <div class="flex items-center justify-center gap-6 mt-8 mb-16 flex-wrap md:mt-0 md:mb-8">
+        <h1 class="text-4xl font-light text-blue-900 dark:text-blue-300 m-0 md:text-3xl">World Clock</h1>
+        <div class="flex gap-2 bg-white dark:bg-gray-700 p-1 rounded-lg shadow-md">
+          <button class="time-format-btn px-4 py-2 rounded-md text-gray-700 dark:text-gray-300 text-sm cursor-pointer transition-all duration-200 hover:text-gray-900 dark:hover:text-gray-50 data-[active]:bg-gray-100 data-[active]:dark:bg-gray-900 data-[active]:font-bold" data-format="24" data-active>24H</button>
+          <button class="time-format-btn px-4 py-2 rounded-md text-gray-700 dark:text-gray-300 text-sm cursor-pointer transition-all duration-200 hover:text-gray-900 dark:hover:text-gray-50 data-[active]:bg-gray-100 data-[active]:dark:bg-gray-900 data-[active]:font-bold" data-format="12">12H</button>
         </div>
       </div>
 
       <!-- UTC -->
-      <div class="clock-grid">
-        <div class="clock-card">
-          <div id="utc-location" class="location">🌎 UTC</div>
-          <div id="utc-timezone" class="timezone">UTC+0</div>
-          <div id="utc-time" class="time">00:00:00</div>
-          <div id="utc-date" class="date"></div>
+      <div class="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6">
+        <div class="bg-white dark:bg-gray-700 rounded-xl px-8 py-6 shadow-[0_10px_25px_rgba(0,0,0,0.05)] dark:shadow-[0_10px_25px_rgba(0,0,0,0.2)] transition-all duration-300 relative overflow-hidden min-w-[280px] hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(0,0,0,0.15)] dark:hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)] md:px-6 md:py-5">
+          <div id="utc-location" class="location text-lg text-gray-700 dark:text-gray-300 mb-2 font-semibold flex items-center gap-2">🌎 UTC</div>
+          <div id="utc-timezone" class="text-sm text-gray-500 dark:text-gray-400 mb-4 font-mono">UTC+0</div>
+          <div id="utc-time" class="text-4xl font-mono font-light text-gray-900 dark:text-gray-50 tracking-wide mb-4 whitespace-nowrap flex items-center gap-2 md:text-[2.2rem] md:tracking-normal">00:00:00</div>
+          <div id="utc-date" class="text-sm text-gray-500 dark:text-gray-400 font-mono tracking-wide"></div>
         </div>
 
         <!-- Helsinki, Finland -->
-        <div class="clock-card">
-          <div id="helsinki-location" class="location">
+        <div class="bg-white dark:bg-gray-700 rounded-xl px-8 py-6 shadow-[0_10px_25px_rgba(0,0,0,0.05)] dark:shadow-[0_10px_25px_rgba(0,0,0,0.2)] transition-all duration-300 relative overflow-hidden min-w-[280px] hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(0,0,0,0.15)] dark:hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)] md:px-6 md:py-5">
+          <div id="helsinki-location" class="location text-lg text-gray-700 dark:text-gray-300 mb-2 font-semibold flex items-center gap-2">
             🇫🇮 Helsinki, Finland
           </div>
-          <div id="helsinki-timezone" class="timezone">UTC+3</div>
-          <div id="helsinki-time" class="time">00:00:00</div>
-          <div id="helsinki-date" class="date"></div>
+          <div id="helsinki-timezone" class="text-sm text-gray-500 dark:text-gray-400 mb-4 font-mono">UTC+3</div>
+          <div id="helsinki-time" class="text-4xl font-mono font-light text-gray-900 dark:text-gray-50 tracking-wide mb-4 whitespace-nowrap flex items-center gap-2 md:text-[2.2rem] md:tracking-normal">00:00:00</div>
+          <div id="helsinki-date" class="text-sm text-gray-500 dark:text-gray-400 font-mono tracking-wide"></div>
         </div>
 
         <!-- Manila, Philippines -->
-        <div class="clock-card">
-          <div id="manila-location" class="location">
+        <div class="bg-white dark:bg-gray-700 rounded-xl px-8 py-6 shadow-[0_10px_25px_rgba(0,0,0,0.05)] dark:shadow-[0_10px_25px_rgba(0,0,0,0.2)] transition-all duration-300 relative overflow-hidden min-w-[280px] hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(0,0,0,0.15)] dark:hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)] md:px-6 md:py-5">
+          <div id="manila-location" class="location text-lg text-gray-700 dark:text-gray-300 mb-2 font-semibold flex items-center gap-2">
             🇵🇭 Manila, Philippines
           </div>
-          <div id="manila-timezone" class="timezone">UTC+8</div>
-          <div id="manila-time" class="time">00:00:00</div>
-          <div id="manila-date" class="date"></div>
+          <div id="manila-timezone" class="text-sm text-gray-500 dark:text-gray-400 mb-4 font-mono">UTC+8</div>
+          <div id="manila-time" class="text-4xl font-mono font-light text-gray-900 dark:text-gray-50 tracking-wide mb-4 whitespace-nowrap flex items-center gap-2 md:text-[2.2rem] md:tracking-normal">00:00:00</div>
+          <div id="manila-date" class="text-sm text-gray-500 dark:text-gray-400 font-mono tracking-wide"></div>
         </div>
 
         <!-- The Hague, Netherlands -->
-        <div class="clock-card">
-          <div id="netherlands-location" class="location">
+        <div class="bg-white dark:bg-gray-700 rounded-xl px-8 py-6 shadow-[0_10px_25px_rgba(0,0,0,0.05)] dark:shadow-[0_10px_25px_rgba(0,0,0,0.2)] transition-all duration-300 relative overflow-hidden min-w-[280px] hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(0,0,0,0.15)] dark:hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)] md:px-6 md:py-5">
+          <div id="netherlands-location" class="location text-lg text-gray-700 dark:text-gray-300 mb-2 font-semibold flex items-center gap-2">
             🇳🇱 The Hague, Netherlands
           </div>
-          <div id="netherlands-timezone" class="timezone">UTC+2</div>
-          <div id="netherlands-time" class="time">00:00:00</div>
-          <div id="netherlands-date" class="date"></div>
+          <div id="netherlands-timezone" class="text-sm text-gray-500 dark:text-gray-400 mb-4 font-mono">UTC+2</div>
+          <div id="netherlands-time" class="text-4xl font-mono font-light text-gray-900 dark:text-gray-50 tracking-wide mb-4 whitespace-nowrap flex items-center gap-2 md:text-[2.2rem] md:tracking-normal">00:00:00</div>
+          <div id="netherlands-date" class="text-sm text-gray-500 dark:text-gray-400 font-mono tracking-wide"></div>
         </div>
 
         <!-- San Fran, USA -->
-        <div class="clock-card">
-          <div id="sf-location" class="location">🇺🇸 San Francisco, USA</div>
-          <div id="sf-timezone" class="timezone">UTC-7</div>
-          <div id="san-francisco-time" class="time">00:00:00</div>
-          <div id="san-francisco-date" class="date"></div>
+        <div class="bg-white dark:bg-gray-700 rounded-xl px-8 py-6 shadow-[0_10px_25px_rgba(0,0,0,0.05)] dark:shadow-[0_10px_25px_rgba(0,0,0,0.2)] transition-all duration-300 relative overflow-hidden min-w-[280px] hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(0,0,0,0.15)] dark:hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)] md:px-6 md:py-5">
+          <div id="sf-location" class="location text-lg text-gray-700 dark:text-gray-300 mb-2 font-semibold flex items-center gap-2">🇺🇸 San Francisco, USA</div>
+          <div id="sf-timezone" class="text-sm text-gray-500 dark:text-gray-400 mb-4 font-mono">UTC-7</div>
+          <div id="san-francisco-time" class="text-4xl font-mono font-light text-gray-900 dark:text-gray-50 tracking-wide mb-4 whitespace-nowrap flex items-center gap-2 md:text-[2.2rem] md:tracking-normal">00:00:00</div>
+          <div id="san-francisco-date" class="text-sm text-gray-500 dark:text-gray-400 font-mono tracking-wide"></div>
         </div>
 
         <!-- Beijing, China -->
-        <div class="clock-card">
-          <div id="beijing-location" class="location">🇨🇳 Beijing, China</div>
-          <div id="beijing-timezone" class="timezone">UTC+8</div>
-          <div id="beijing-time" class="time">00:00:00</div>
-          <div id="beijing-date" class="date"></div>
+        <div class="bg-white dark:bg-gray-700 rounded-xl px-8 py-6 shadow-[0_10px_25px_rgba(0,0,0,0.05)] dark:shadow-[0_10px_25px_rgba(0,0,0,0.2)] transition-all duration-300 relative overflow-hidden min-w-[280px] hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(0,0,0,0.15)] dark:hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)] md:px-6 md:py-5">
+          <div id="beijing-location" class="location text-lg text-gray-700 dark:text-gray-300 mb-2 font-semibold flex items-center gap-2">🇨🇳 Beijing, China</div>
+          <div id="beijing-timezone" class="text-sm text-gray-500 dark:text-gray-400 mb-4 font-mono">UTC+8</div>
+          <div id="beijing-time" class="text-4xl font-mono font-light text-gray-900 dark:text-gray-50 tracking-wide mb-4 whitespace-nowrap flex items-center gap-2 md:text-[2.2rem] md:tracking-normal">00:00:00</div>
+          <div id="beijing-date" class="text-sm text-gray-500 dark:text-gray-400 font-mono tracking-wide"></div>
         </div>
 
         <!-- Sydney, Australia -->
-        <div class="clock-card">
-          <div id="sydney-location" class="location">🇦🇺 Sydney, Australia</div>
-          <div id="sydney-timezone" class="timezone">UTC+10</div>
-          <div id="sydney-time" class="time">00:00:00</div>
-          <div id="sydney-date" class="date"></div>
+        <div class="bg-white dark:bg-gray-700 rounded-xl px-8 py-6 shadow-[0_10px_25px_rgba(0,0,0,0.05)] dark:shadow-[0_10px_25px_rgba(0,0,0,0.2)] transition-all duration-300 relative overflow-hidden min-w-[280px] hover:-translate-y-1 hover:shadow-[0_15px_30px_rgba(0,0,0,0.15)] dark:hover:shadow-[0_15px_30px_rgba(0,0,0,0.4)] md:px-6 md:py-5">
+          <div id="sydney-location" class="location text-lg text-gray-700 dark:text-gray-300 mb-2 font-semibold flex items-center gap-2">🇦🇺 Sydney, Australia</div>
+          <div id="sydney-timezone" class="text-sm text-gray-500 dark:text-gray-400 mb-4 font-mono">UTC+10</div>
+          <div id="sydney-time" class="text-4xl font-mono font-light text-gray-900 dark:text-gray-50 tracking-wide mb-4 whitespace-nowrap flex items-center gap-2 md:text-[2.2rem] md:tracking-normal">00:00:00</div>
+          <div id="sydney-date" class="text-sm text-gray-500 dark:text-gray-400 font-mono tracking-wide"></div>
         </div>
       </div>
-      <footer class="footer">
+      <footer class="text-center mt-12 p-6 text-gray-500 dark:text-gray-400 text-sm">
         <p>
           Created by
           <a
             href="https://www.poncardas.com"
             target="_blank"
             rel="noopener noreferrer"
+            class="text-blue-900 dark:text-blue-300 no-underline transition-opacity duration-200 hover:opacity-80"
             >Mchael Poncardas</a
           >
           |
@@ -171,6 +172,7 @@ import '../styles/global.css';
             href="https://github.com/poncardasm/world-clock"
             target="_blank"
             rel="noopener noreferrer"
+            class="text-blue-900 dark:text-blue-300 no-underline transition-opacity duration-200 hover:opacity-80"
             >Source on GitHub</a
           >
         </p>

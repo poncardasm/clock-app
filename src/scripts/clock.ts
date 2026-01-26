@@ -72,8 +72,8 @@ function updateClocks(): void {
 document.querySelectorAll('.time-format-btn').forEach((btn) => {
   btn.addEventListener('click', () => {
     // Update active state
-    document.querySelectorAll('.time-format-btn').forEach((b) => b.classList.remove('active'));
-    btn.classList.add('active');
+    document.querySelectorAll('.time-format-btn').forEach((b) => b.removeAttribute('data-active'));
+    (btn as HTMLElement).setAttribute('data-active', '');
 
     // Update time format
     const format = (btn as HTMLElement).dataset.format;
