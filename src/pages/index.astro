@@ -1,3 +1,7 @@
+---
+import '../styles/global.css';
+---
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
@@ -11,7 +15,7 @@
       property="og:description"
       content="A sleek world clock application showing real-time updates for multiple time zones including UTC, Helsinki, Manila, San Francisco, Beijing, and The Hague."
     />
-    <meta property="og:image" content="assets/og-img.png" />
+    <meta property="og:image" content="/assets/og-img.png" />
     <meta property="og:url" content="https://poncardas.com/clock" />
     <meta property="og:type" content="website" />
     <meta name="twitter:card" content="summary_large_image" />
@@ -23,33 +27,33 @@
       name="twitter:description"
       content="A sleek world clock application showing real-time updates for multiple time zones including UTC, Helsinki, Manila, San Francisco, Beijing, and The Hague."
     />
-    <meta name="twitter:image" content="assets/og-img.png" />
+    <meta name="twitter:image" content="/assets/og-img.png" />
     <title>World Clock</title>
-    <link rel="icon" href="assets/favicon/favicon.ico" type="image/x-icon" />
+    <link rel="icon" href="/assets/favicon/favicon.ico" type="image/x-icon" />
     <link
       rel="shortcut icon"
-      href="assets/favicon/favicon.ico"
+      href="/assets/favicon/favicon.ico"
       type="image/x-icon"
     />
     <link
       rel="apple-touch-icon"
       sizes="180x180"
-      href="assets/favicon/apple-touch-icon.png"
+      href="/assets/favicon/apple-touch-icon.png"
     />
     <link
       rel="icon"
       type="image/png"
       sizes="32x32"
-      href="assets/favicon/favicon-32x32.png"
+      href="/assets/favicon/favicon-32x32.png"
     />
     <link
       rel="icon"
       type="image/png"
       sizes="16x16"
-      href="assets/favicon/favicon-16x16.png"
+      href="/assets/favicon/favicon-16x16.png"
     />
-    <link rel="manifest" href="assets/favicon/site.webmanifest" />
-    <script>
+    <link rel="manifest" href="/assets/favicon/site.webmanifest" />
+    <script is:inline>
       // Check if the user has a system-wide dark mode preference
       if (
         window.matchMedia &&
@@ -69,7 +73,6 @@
           }
         });
     </script>
-    <link rel="stylesheet" href="styles.css" />
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
@@ -174,6 +177,6 @@
       </footer>
     </div>
 
-    <script src="script.js"></script>
+    <script src="../scripts/clock.ts"></script>
   </body>
 </html>
