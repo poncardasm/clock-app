@@ -85,14 +85,13 @@ import '../styles/global.css';
     />
   </head>
   <body class="min-h-screen flex items-start justify-center bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-50 transition-colors duration-300 py-8">
-    <div class="w-full max-w-7xl px-8 md:px-4">
-      <div class="flex items-center justify-center gap-6 mt-8 mb-16 flex-wrap md:mt-0 md:mb-8">
-        <h1 class="text-4xl font-light text-blue-900 dark:text-blue-300 m-0 md:text-3xl">World Clock</h1>
-        <div class="flex gap-2 bg-white dark:bg-gray-700 p-1 rounded-lg shadow-md">
-          <button class="time-format-btn px-4 py-2 rounded-md text-gray-700 dark:text-gray-300 text-sm cursor-pointer transition-all duration-200 hover:text-gray-900 dark:hover:text-gray-50 data-[active]:bg-gray-100 data-[active]:dark:bg-gray-900 data-[active]:font-bold" data-format="24" data-active>24H</button>
-          <button class="time-format-btn px-4 py-2 rounded-md text-gray-700 dark:text-gray-300 text-sm cursor-pointer transition-all duration-200 hover:text-gray-900 dark:hover:text-gray-50 data-[active]:bg-gray-100 data-[active]:dark:bg-gray-900 data-[active]:font-bold" data-format="12">12H</button>
-        </div>
+    <div class="fixed top-8 right-8 z-10 md:top-4 md:right-4">
+      <div class="flex gap-2 bg-white dark:bg-gray-700 p-1 rounded-lg shadow-md">
+        <button class="time-format-btn px-4 py-2 rounded-md text-gray-700 dark:text-gray-300 text-sm cursor-pointer transition-all duration-200 hover:text-gray-900 dark:hover:text-gray-50 data-[active]:bg-gray-100 data-[active]:dark:bg-gray-900 data-[active]:font-bold" data-format="24" data-active>24H</button>
+        <button class="time-format-btn px-4 py-2 rounded-md text-gray-700 dark:text-gray-300 text-sm cursor-pointer transition-all duration-200 hover:text-gray-900 dark:hover:text-gray-50 data-[active]:bg-gray-100 data-[active]:dark:bg-gray-900 data-[active]:font-bold" data-format="12">12H</button>
       </div>
+    </div>
+    <div class="w-full max-w-7xl px-8 md:px-4">
 
       <!-- UTC -->
       <div class="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6 max-w-[calc(3*280px+2*1.5rem+4rem)] mx-auto">
