@@ -1,0 +1,376 @@
+---
+import '../styles/global.css';
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta
+      property="og:title"
+      content="World Clock - Track Time Across the Globe"
+    />
+    <meta
+      property="og:description"
+      content="A sleek world clock application showing real-time updates for multiple time zones including UTC, Helsinki, Manila, San Francisco, Beijing, and The Hague."
+    />
+    <meta property="og:image" content="/assets/og-img.png" />
+    <meta property="og:url" content="https://poncardas.com/clock" />
+    <meta property="og:type" content="website" />
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta
+      name="twitter:title"
+      content="World Clock - Track Time Across the Globe"
+    />
+    <meta
+      name="twitter:description"
+      content="A sleek world clock application showing real-time updates for multiple time zones including UTC, Helsinki, Manila, San Francisco, Beijing, and The Hague."
+    />
+    <meta name="twitter:image" content="/assets/og-img.png" />
+    <title>World Clock</title>
+    <link rel="icon" href="/assets/favicon/favicon.ico" type="image/x-icon" />
+    <link
+      rel="shortcut icon"
+      href="/assets/favicon/favicon.ico"
+      type="image/x-icon"
+    />
+    <link
+      rel="apple-touch-icon"
+      sizes="180x180"
+      href="/assets/favicon/apple-touch-icon.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="32x32"
+      href="/assets/favicon/favicon-32x32.png"
+    />
+    <link
+      rel="icon"
+      type="image/png"
+      sizes="16x16"
+      href="/assets/favicon/favicon-16x16.png"
+    />
+    <link rel="manifest" href="/assets/favicon/site.webmanifest" />
+    <script is:inline>
+      // Check for saved theme preference or default to light
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
+        document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
+      }
+    </script>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Space+Mono:wght@400;700&display=swap"
+      rel="stylesheet"
+    />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Google+Sans+Code:ital,wght@0,300..800;1,300..800&display=swap"
+      rel="stylesheet"
+    />
+  </head>
+  <body
+    class="min-h-screen flex items-start justify-center bg-background text-foreground transition-colors duration-300 py-8"
+  >
+    <div class="w-full max-w-7xl px-8 md:px-4">
+      <div class="flex justify-center mb-8">
+        <div class="flex gap-2">
+          <div
+            class="flex gap-2 bg-card dark:bg-card p-1 rounded-lg border border-border dark:border-border"
+          >
+            <button
+              class="time-format-btn px-4 py-2 rounded-md text-secondary-foreground dark:text-secondary-foreground text-sm cursor-pointer transition-all duration-200 hover:text-foreground dark:hover:text-primary-foreground data-active:bg-secondary data-active:dark:bg-secondary data-active:font-bold"
+              data-format="24"
+              data-active>24H</button
+            >
+            <button
+              class="time-format-btn px-4 py-2 rounded-md text-secondary-foreground dark:text-secondary-foreground text-sm cursor-pointer transition-all duration-200 hover:text-foreground dark:hover:text-primary-foreground data-active:bg-secondary data-active:dark:bg-secondary data-active:font-bold"
+              data-format="12">12H</button
+            >
+          </div>
+          <button
+            id="theme-toggle"
+            class="bg-card dark:bg-card p-2 rounded-lg border border-border dark:border-border text-secondary-foreground dark:text-secondary-foreground cursor-pointer transition-all duration-200 hover:text-foreground dark:hover:text-primary-foreground"
+            aria-label="Toggle theme"
+          >
+            <img
+              src="/assets/icons/light-mode.svg"
+              alt="Light mode"
+              class="dark:hidden w-6 h-6"
+            />
+            <img
+              src="/assets/icons/dark-mode.svg"
+              alt="Dark mode"
+              class="hidden dark:block w-6 h-6"
+            />
+          </button>
+        </div>
+      </div>
+      <!-- UTC -->
+      <div
+        class="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6 max-w-[calc(3*280px+2*1.5rem+4rem)] mx-auto"
+      >
+        <div
+          class="bg-card dark:bg-card rounded-xl px-8 py-6 transition-all duration-300 relative overflow-hidden min-w-70 hover:-translate-y-1 md:px-6 md:py-5 border border-border dark:border-border"
+        >
+          <div
+            id="utc-location"
+            class="location text-lg text-card-foreground dark:text-card-foreground mb-2 font-semibold"
+          >
+            🌎 UTC
+          </div>
+          <div
+            id="utc-timezone"
+            class="text-sm text-muted-foreground dark:text-muted-foreground mb-4 font-mono"
+          >
+            UTC+0
+          </div>
+          <div
+            id="utc-time"
+            class="text-4xl font-mono font-light text-foreground dark:text-card-foreground tracking-wide mb-4 whitespace-nowrap flex items-center gap-2 md:text-[2.2rem] md:tracking-normal"
+          >
+            00:00:00
+          </div>
+          <div
+            id="utc-date"
+            class="text-sm text-muted-foreground dark:text-muted-foreground font-mono tracking-wide"
+          >
+          </div>
+        </div>
+
+        <!-- Helsinki, Finland -->
+        <div
+          class="bg-card dark:bg-card rounded-xl px-8 py-6 transition-all duration-300 relative overflow-hidden min-w-70 hover:-translate-y-1 md:px-6 md:py-5 border border-border dark:border-border"
+        >
+          <div
+            id="helsinki-location"
+            class="location text-lg text-card-foreground dark:text-card-foreground mb-2 font-semibold"
+          >
+            🇫🇮 Helsinki, Finland
+          </div>
+          <div
+            id="helsinki-timezone"
+            class="text-sm text-muted-foreground dark:text-muted-foreground mb-4 font-mono"
+          >
+            UTC+3
+          </div>
+          <div
+            id="helsinki-time"
+            class="text-4xl font-mono font-light text-foreground dark:text-card-foreground tracking-wide mb-4 whitespace-nowrap flex items-center gap-2 md:text-[2.2rem] md:tracking-normal"
+          >
+            00:00:00
+          </div>
+          <div
+            id="helsinki-date"
+            class="text-sm text-muted-foreground dark:text-muted-foreground font-mono tracking-wide"
+          >
+          </div>
+        </div>
+
+        <!-- Manila, Philippines -->
+        <div
+          class="bg-card dark:bg-card rounded-xl px-8 py-6 transition-all duration-300 relative overflow-hidden min-w-70 hover:-translate-y-1 md:px-6 md:py-5 border border-border dark:border-border"
+        >
+          <div
+            id="manila-location"
+            class="location text-lg text-card-foreground dark:text-card-foreground mb-2 font-semibold"
+          >
+            🇵🇭 Manila, Philippines
+          </div>
+          <div
+            id="manila-timezone"
+            class="text-sm text-muted-foreground dark:text-muted-foreground mb-4 font-mono"
+          >
+            UTC+8
+          </div>
+          <div
+            id="manila-time"
+            class="text-4xl font-mono font-light text-foreground dark:text-card-foreground tracking-wide mb-4 whitespace-nowrap flex items-center gap-2 md:text-[2.2rem] md:tracking-normal"
+          >
+            00:00:00
+          </div>
+          <div
+            id="manila-date"
+            class="text-sm text-muted-foreground dark:text-muted-foreground font-mono tracking-wide"
+          >
+          </div>
+        </div>
+
+        <!-- The Hague, Netherlands -->
+        <div
+          class="bg-card dark:bg-card rounded-xl px-8 py-6 transition-all duration-300 relative overflow-hidden min-w-70 hover:-translate-y-1 md:px-6 md:py-5 border border-border dark:border-border"
+        >
+          <div
+            id="netherlands-location"
+            class="location text-lg text-card-foreground dark:text-card-foreground mb-2 font-semibold"
+          >
+            🇳🇱 The Hague, Netherlands
+          </div>
+          <div
+            id="netherlands-timezone"
+            class="text-sm text-muted-foreground dark:text-muted-foreground mb-4 font-mono"
+          >
+            UTC+2
+          </div>
+          <div
+            id="netherlands-time"
+            class="text-4xl font-mono font-light text-foreground dark:text-card-foreground tracking-wide mb-4 whitespace-nowrap flex items-center gap-2 md:text-[2.2rem] md:tracking-normal"
+          >
+            00:00:00
+          </div>
+          <div
+            id="netherlands-date"
+            class="text-sm text-muted-foreground dark:text-muted-foreground font-mono tracking-wide"
+          >
+          </div>
+        </div>
+
+        <!-- San Fran, USA -->
+        <div
+          class="bg-card dark:bg-card rounded-xl px-8 py-6 transition-all duration-300 relative overflow-hidden min-w-70 hover:-translate-y-1 md:px-6 md:py-5 border border-border dark:border-border"
+        >
+          <div
+            id="sf-location"
+            class="location text-lg text-card-foreground dark:text-card-foreground mb-2 font-semibold"
+          >
+            🇺🇸 San Francisco, USA
+          </div>
+          <div
+            id="sf-timezone"
+            class="text-sm text-muted-foreground dark:text-muted-foreground mb-4 font-mono"
+          >
+            UTC-7
+          </div>
+          <div
+            id="san-francisco-time"
+            class="text-4xl font-mono font-light text-foreground dark:text-card-foreground tracking-wide mb-4 whitespace-nowrap flex items-center gap-2 md:text-[2.2rem] md:tracking-normal"
+          >
+            00:00:00
+          </div>
+          <div
+            id="san-francisco-date"
+            class="text-sm text-muted-foreground dark:text-muted-foreground font-mono tracking-wide"
+          >
+          </div>
+        </div>
+
+        <!-- Beijing, China -->
+        <div
+          class="bg-card dark:bg-card rounded-xl px-8 py-6 transition-all duration-300 relative overflow-hidden min-w-70 hover:-translate-y-1 md:px-6 md:py-5 border border-border dark:border-border"
+        >
+          <div
+            id="beijing-location"
+            class="location text-lg text-card-foreground dark:text-card-foreground mb-2 font-semibold"
+          >
+            🇨🇳 Beijing, China
+          </div>
+          <div
+            id="beijing-timezone"
+            class="text-sm text-muted-foreground dark:text-muted-foreground mb-4 font-mono"
+          >
+            UTC+8
+          </div>
+          <div
+            id="beijing-time"
+            class="text-4xl font-mono font-light text-foreground dark:text-card-foreground tracking-wide mb-4 whitespace-nowrap flex items-center gap-2 md:text-[2.2rem] md:tracking-normal"
+          >
+            00:00:00
+          </div>
+          <div
+            id="beijing-date"
+            class="text-sm text-muted-foreground dark:text-muted-foreground font-mono tracking-wide"
+          >
+          </div>
+        </div>
+
+        <!-- Sydney, Australia -->
+        <div
+          class="bg-card dark:bg-card rounded-xl px-8 py-6 transition-all duration-300 relative overflow-hidden min-w-70 hover:-translate-y-1 md:px-6 md:py-5 border border-border dark:border-border"
+        >
+          <div
+            id="sydney-location"
+            class="location text-lg text-card-foreground dark:text-card-foreground mb-2 font-semibold"
+          >
+            🇦🇺 Sydney, Australia
+          </div>
+          <div
+            id="sydney-timezone"
+            class="text-sm text-muted-foreground dark:text-muted-foreground mb-4 font-mono"
+          >
+            UTC+10
+          </div>
+          <div
+            id="sydney-time"
+            class="text-4xl font-mono font-light text-foreground dark:text-card-foreground tracking-wide mb-4 whitespace-nowrap flex items-center gap-2 md:text-[2.2rem] md:tracking-normal"
+          >
+            00:00:00
+          </div>
+          <div
+            id="sydney-date"
+            class="text-sm text-muted-foreground dark:text-muted-foreground font-mono tracking-wide"
+          >
+          </div>
+        </div>
+
+        <!-- Tokyo, Japan -->
+        <div
+          class="bg-card dark:bg-card rounded-xl px-8 py-6 transition-all duration-300 relative overflow-hidden min-w-70 hover:-translate-y-1 md:px-6 md:py-5 border border-border dark:border-border"
+        >
+          <div
+            id="tokyo-location"
+            class="location text-lg text-card-foreground dark:text-card-foreground mb-2 font-semibold"
+          >
+            🇯🇵 Tokyo, Japan
+          </div>
+          <div
+            id="tokyo-timezone"
+            class="text-sm text-muted-foreground dark:text-muted-foreground mb-4 font-mono"
+          >
+            UTC+9
+          </div>
+          <div
+            id="tokyo-time"
+            class="text-4xl font-mono font-light text-foreground dark:text-card-foreground tracking-wide mb-4 whitespace-nowrap flex items-center gap-2 md:text-[2.2rem] md:tracking-normal"
+          >
+            00:00:00
+          </div>
+          <div
+            id="tokyo-date"
+            class="text-sm text-muted-foreground dark:text-muted-foreground font-mono tracking-wide"
+          >
+          </div>
+        </div>
+      </div>
+      <footer class="text-center mt-12 p-6 text-gray-300 text-sm">
+        <p>
+          Created by
+          <a
+            href="https://poncardas.com"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-blue-600 dark:text-blue-400 no-underline transition-opacity duration-200 hover:opacity-80"
+            >Mchael Poncardas</a
+          >
+          |
+          <a
+            href="https://github.com/poncardasm/clock-app"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="text-blue-600 dark:text-blue-400 no-underline transition-opacity duration-200 hover:opacity-80"
+            >Source on GitHub</a
+          >
+        </p>
+      </footer>
+    </div>
+
+    <script src="../scripts/clock.ts"></script>
+  </body>
+</html>

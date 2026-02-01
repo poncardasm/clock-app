@@ -47,3 +47,6 @@ logs
 .eslintcache
 .npm
 .temp/
+
+# Astro
+.astro/
