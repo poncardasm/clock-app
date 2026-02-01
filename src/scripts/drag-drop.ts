@@ -3,6 +3,11 @@
 
 const STORAGE_KEY = 'clock-card-order';
 
+// Check if device is mobile (touch-only)
+function isMobile(): boolean {
+  return window.matchMedia('(pointer: coarse)').matches;
+}
+
 // Initialize drag and drop
 function initDragAndDrop(): void {
   const grid = document.getElementById('clock-grid');
@@ -13,17 +18,22 @@ function initDragAndDrop(): void {
   // Restore saved order on page load
   restoreOrder(grid);
 
+  // Disable drag and drop on mobile devices
+  if (isMobile()) {
+    cards.forEach((card) => {
+      const htmlCard = card as HTMLElement;
+      htmlCard.removeAttribute('draggable');
+      htmlCard.classList.remove('cursor-move');
+    });
+    return;
+  }
+
   cards.forEach((card) => {
     const htmlCard = card as HTMLElement;
     
-    // Mouse/Touch events for drag start
+    // Mouse events for drag start (desktop only)
     htmlCard.addEventListener('dragstart', handleDragStart);
     htmlCard.addEventListener('dragend', handleDragEnd);
-    
-    // Touch events for mobile support
-    htmlCard.addEventListener('touchstart', handleTouchStart, { passive: false });
-    htmlCard.addEventListener('touchmove', handleTouchMove, { passive: false });
-    htmlCard.addEventListener('touchend', handleTouchEnd);
   });
 
   // Grid container events
@@ -34,10 +44,6 @@ function initDragAndDrop(): void {
 }
 
 let draggedElement: HTMLElement | null = null;
-let touchDragElement: HTMLElement | null = null;
-let touchStartX = 0;
-let touchStartY = 0;
-let touchStartTime = 0;
 
 // Drag start handler
 function handleDragStart(e: DragEvent): void {
@@ -127,82 +133,7 @@ function handleDrop(e: DragEvent): void {
   }
 }
 
-// Touch event handlers for mobile support
-function handleTouchStart(e: TouchEvent): void {
-  const touch = e.touches[0];
-  touchStartX = touch.clientX;
-  touchStartY = touch.clientY;
-  touchStartTime = Date.now();
-  
-  touchDragElement = e.currentTarget as HTMLElement;
-}
 
-function handleTouchMove(e: TouchEvent): void {
-  if (!touchDragElement) return;
-  
-  const touch = e.touches[0];
-  const deltaX = Math.abs(touch.clientX - touchStartX);
-  const deltaY = Math.abs(touch.clientY - touchStartY);
-  
-  // If moving more than 10px, prevent scrolling and start drag
-  if (deltaX > 10 || deltaY > 10) {
-    e.preventDefault();
-    touchDragElement.classList.add('dragging');
-    
-    // Find element under touch
-    const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
-    if (elementBelow) {
-      const cardBelow = elementBelow.closest('.clock-card') as HTMLElement;
-      
-      // Remove drag-over from all cards
-      document.querySelectorAll('.clock-card').forEach((c) => {
-        c.classList.remove('drag-over');
-      });
-      
-      // Add drag-over to card below
-      if (cardBelow && cardBelow !== touchDragElement) {
-        cardBelow.classList.add('drag-over');
-      }
-    }
-  }
-}
-
-function handleTouchEnd(e: TouchEvent): void {
-  if (!touchDragElement) return;
-  
-  const touch = e.changedTouches[0];
-  const elementBelow = document.elementFromPoint(touch.clientX, touch.clientY);
-  
-  if (elementBelow) {
-    const dropTarget = elementBelow.closest('.clock-card') as HTMLElement;
-    
-    if (dropTarget && dropTarget !== touchDragElement) {
-      const grid = document.getElementById('clock-grid');
-      if (!grid) return;
-      
-      const cards = Array.from(grid.querySelectorAll('.clock-card'));
-      const draggedIndex = cards.indexOf(touchDragElement);
-      const dropIndex = cards.indexOf(dropTarget);
-      
-      // Reorder DOM elements
-      if (draggedIndex < dropIndex) {
-        dropTarget.after(touchDragElement);
-      } else {
-        dropTarget.before(touchDragElement);
-      }
-      
-      saveOrder();
-    }
-  }
-  
-  // Clean up
-  touchDragElement.classList.remove('dragging');
-  document.querySelectorAll('.clock-card').forEach((c) => {
-    c.classList.remove('drag-over');
-  });
-  
-  touchDragElement = null;
-}
 
 // Save order to localStorage
 function saveOrder(): void {
@@ -217,34 +148,43 @@ function saveOrder(): void {
   localStorage.setItem(STORAGE_KEY, JSON.stringify(order));
 }
 
-// Restore order from localStorage
+// Default order: UTC, Finland, Philippines, Netherlands, San Francisco, Beijing, Sydney, Tokyo
+const DEFAULT_ORDER = ['utc', 'helsinki', 'manila', 'netherlands', 'san-francisco', 'beijing', 'sydney', 'tokyo'];
+
+// Restore order from localStorage or use default
 function restoreOrder(grid: HTMLElement): void {
   const savedOrder = localStorage.getItem(STORAGE_KEY);
-  if (!savedOrder) return;
+  let order: string[];
   
-  try {
-    const order: string[] = JSON.parse(savedOrder);
-    const cards = Array.from(grid.querySelectorAll('.clock-card'));
-    
-    // Create a map of location -> card
-    const cardMap = new Map<string, HTMLElement>();
-    cards.forEach((card) => {
-      const location = (card as HTMLElement).dataset.location;
-      if (location) {
-        cardMap.set(location, card as HTMLElement);
-      }
-    });
-    
-    // Reorder cards based on saved order
-    order.forEach((location) => {
-      const card = cardMap.get(location);
-      if (card) {
-        grid.appendChild(card);
-      }
-    });
-  } catch (e) {
-    console.error('Failed to restore clock card order:', e);
+  if (savedOrder) {
+    try {
+      order = JSON.parse(savedOrder);
+    } catch (e) {
+      console.error('Failed to parse saved order:', e);
+      order = DEFAULT_ORDER;
+    }
+  } else {
+    order = DEFAULT_ORDER;
   }
+  
+  const cards = Array.from(grid.querySelectorAll('.clock-card'));
+  
+  // Create a map of location -> card
+  const cardMap = new Map<string, HTMLElement>();
+  cards.forEach((card) => {
+    const location = (card as HTMLElement).dataset.location;
+    if (location) {
+      cardMap.set(location, card as HTMLElement);
+    }
+  });
+  
+  // Reorder cards based on order
+  order.forEach((location) => {
+    const card = cardMap.get(location);
+    if (card) {
+      grid.appendChild(card);
+    }
+  });
 }
 
 // Initialize when DOM is ready
