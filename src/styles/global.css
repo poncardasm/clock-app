@@ -3,7 +3,7 @@
 @theme {
   /* Custom fonts */
   --font-sans: 'Inter', sans-serif;
-  --font-mono: 'Space Mono', monospace;
+  --font-mono: 'Google Sans Code', monospace;
 }
 
 /* Custom styles for day/night indicator */
