@@ -61,6 +61,7 @@ function updateClocks(): void {
   updateClock('Asia/Shanghai', 'beijing-time', 'beijing-date', 'beijing-location');
   updateClock('Europe/Amsterdam', 'netherlands-time', 'netherlands-date', 'netherlands-location');
   updateClock('Australia/Sydney', 'sydney-time', 'sydney-date', 'sydney-location');
+  updateClock('Asia/Tokyo', 'tokyo-time', 'tokyo-date', 'tokyo-location');
 }
 
 // Handle time format toggle
