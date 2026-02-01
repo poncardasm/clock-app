@@ -114,12 +114,16 @@ import '../styles/global.css';
           </button>
         </div>
       </div>
-      <!-- UTC -->
+      <!-- Clock Cards Container -->
       <div
+        id="clock-grid"
         class="grid grid-cols-[repeat(auto-fit,minmax(280px,1fr))] gap-6 max-w-[calc(3*280px+2*1.5rem+4rem)] mx-auto"
       >
+        <!-- UTC -->
         <div
-          class="bg-card dark:bg-card rounded-xl px-8 py-6 transition-all duration-300 relative overflow-hidden min-w-70 hover:-translate-y-1 md:px-6 md:py-5 border border-border dark:border-border"
+          class="clock-card bg-card dark:bg-card rounded-xl px-8 py-6 transition-all duration-300 relative overflow-hidden min-w-70 hover:-translate-y-1 md:px-6 md:py-5 border border-border dark:border-border cursor-move"
+          draggable="true"
+          data-location="utc"
         >
           <div
             id="utc-location"
@@ -148,7 +152,9 @@ import '../styles/global.css';
 
         <!-- Helsinki, Finland -->
         <div
-          class="bg-card dark:bg-card rounded-xl px-8 py-6 transition-all duration-300 relative overflow-hidden min-w-70 hover:-translate-y-1 md:px-6 md:py-5 border border-border dark:border-border"
+          class="clock-card bg-card dark:bg-card rounded-xl px-8 py-6 transition-all duration-300 relative overflow-hidden min-w-70 hover:-translate-y-1 md:px-6 md:py-5 border border-border dark:border-border cursor-move"
+          draggable="true"
+          data-location="helsinki"
         >
           <div
             id="helsinki-location"
@@ -177,7 +183,9 @@ import '../styles/global.css';
 
         <!-- Manila, Philippines -->
         <div
-          class="bg-card dark:bg-card rounded-xl px-8 py-6 transition-all duration-300 relative overflow-hidden min-w-70 hover:-translate-y-1 md:px-6 md:py-5 border border-border dark:border-border"
+          class="clock-card bg-card dark:bg-card rounded-xl px-8 py-6 transition-all duration-300 relative overflow-hidden min-w-70 hover:-translate-y-1 md:px-6 md:py-5 border border-border dark:border-border cursor-move"
+          draggable="true"
+          data-location="manila"
         >
           <div
             id="manila-location"
@@ -206,7 +214,9 @@ import '../styles/global.css';
 
         <!-- The Hague, Netherlands -->
         <div
-          class="bg-card dark:bg-card rounded-xl px-8 py-6 transition-all duration-300 relative overflow-hidden min-w-70 hover:-translate-y-1 md:px-6 md:py-5 border border-border dark:border-border"
+          class="clock-card bg-card dark:bg-card rounded-xl px-8 py-6 transition-all duration-300 relative overflow-hidden min-w-70 hover:-translate-y-1 md:px-6 md:py-5 border border-border dark:border-border cursor-move"
+          draggable="true"
+          data-location="netherlands"
         >
           <div
             id="netherlands-location"
@@ -233,9 +243,11 @@ import '../styles/global.css';
           </div>
         </div>
 
-        <!-- San Fran, USA -->
+        <!-- San Francisco, USA -->
         <div
-          class="bg-card dark:bg-card rounded-xl px-8 py-6 transition-all duration-300 relative overflow-hidden min-w-70 hover:-translate-y-1 md:px-6 md:py-5 border border-border dark:border-border"
+          class="clock-card bg-card dark:bg-card rounded-xl px-8 py-6 transition-all duration-300 relative overflow-hidden min-w-70 hover:-translate-y-1 md:px-6 md:py-5 border border-border dark:border-border cursor-move"
+          draggable="true"
+          data-location="san-francisco"
         >
           <div
             id="sf-location"
@@ -264,7 +276,9 @@ import '../styles/global.css';
 
         <!-- Beijing, China -->
         <div
-          class="bg-card dark:bg-card rounded-xl px-8 py-6 transition-all duration-300 relative overflow-hidden min-w-70 hover:-translate-y-1 md:px-6 md:py-5 border border-border dark:border-border"
+          class="clock-card bg-card dark:bg-card rounded-xl px-8 py-6 transition-all duration-300 relative overflow-hidden min-w-70 hover:-translate-y-1 md:px-6 md:py-5 border border-border dark:border-border cursor-move"
+          draggable="true"
+          data-location="beijing"
         >
           <div
             id="beijing-location"
@@ -293,7 +307,9 @@ import '../styles/global.css';
 
         <!-- Sydney, Australia -->
         <div
-          class="bg-card dark:bg-card rounded-xl px-8 py-6 transition-all duration-300 relative overflow-hidden min-w-70 hover:-translate-y-1 md:px-6 md:py-5 border border-border dark:border-border"
+          class="clock-card bg-card dark:bg-card rounded-xl px-8 py-6 transition-all duration-300 relative overflow-hidden min-w-70 hover:-translate-y-1 md:px-6 md:py-5 border border-border dark:border-border cursor-move"
+          draggable="true"
+          data-location="sydney"
         >
           <div
             id="sydney-location"
@@ -322,7 +338,9 @@ import '../styles/global.css';
 
         <!-- Tokyo, Japan -->
         <div
-          class="bg-card dark:bg-card rounded-xl px-8 py-6 transition-all duration-300 relative overflow-hidden min-w-70 hover:-translate-y-1 md:px-6 md:py-5 border border-border dark:border-border"
+          class="clock-card bg-card dark:bg-card rounded-xl px-8 py-6 transition-all duration-300 relative overflow-hidden min-w-70 hover:-translate-y-1 md:px-6 md:py-5 border border-border dark:border-border cursor-move"
+          draggable="true"
+          data-location="tokyo"
         >
           <div
             id="tokyo-location"
@@ -372,5 +390,6 @@ import '../styles/global.css';
     </div>
 
     <script src="../scripts/clock.ts"></script>
+    <script src="../scripts/drag-drop.ts"></script>
   </body>
 </html>

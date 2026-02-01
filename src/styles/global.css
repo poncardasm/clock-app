@@ -94,4 +94,27 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
+/* Drag and Drop Styles */
+.clock-card {
+  user-select: none;
+  touch-action: pan-y;
+}
+
+.clock-card.dragging {
+  opacity: 0.6;
+  transform: scale(0.98);
+  box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+  z-index: 1000;
+}
+
+.clock-card.drag-over {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
+.dark .clock-card.drag-over {
+  border-color: var(--primary);
+  box-shadow: 0 0 0 2px var(--ring);
+}
+
 
