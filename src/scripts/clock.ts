@@ -49,12 +49,7 @@ function updateClock(timeZone: string, timeId: string, dateId: string, locationI
     dateElement.textContent = timeInZone.toLocaleDateString('en-GB', dateOptions);
   }
 
-  // Update day/night indicator
-  const locationElement = document.getElementById(locationId);
-  if (locationElement) {
-    const dayNightIcon = isDaytime(hour) ? '🌞' : '🌚';
-    locationElement.dataset.daynight = dayNightIcon;
-  }
+
 }
 
 function updateClocks(): void {

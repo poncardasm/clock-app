@@ -94,9 +94,4 @@
   --sidebar-ring: oklch(0.556 0 0);
 }
 
-/* Custom styles for day/night indicator */
-.location::after {
-  content: attr(data-daynight);
-  font-size: 1.2rem;
-  margin-left: auto;
-}
+
