@@ -84,6 +84,15 @@ document.querySelectorAll('.time-format-btn').forEach((btn) => {
   });
 });
 
+// Handle theme toggle
+const themeToggle = document.getElementById('theme-toggle');
+if (themeToggle) {
+  themeToggle.addEventListener('click', () => {
+    const isDark = document.documentElement.classList.toggle('dark');
+    localStorage.setItem('theme', isDark ? 'dark' : 'light');
+  });
+}
+
 // Initial update
 updateClocks();
 

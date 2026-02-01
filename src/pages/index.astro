@@ -54,24 +54,13 @@ import '../styles/global.css';
     />
     <link rel="manifest" href="/assets/favicon/site.webmanifest" />
     <script is:inline>
-      // Check if the user has a system-wide dark mode preference
-      if (
-        window.matchMedia &&
-        window.matchMedia('(prefers-color-scheme: dark)').matches
-      ) {
+      // Check for saved theme preference or default to light
+      const savedTheme = localStorage.getItem('theme');
+      if (savedTheme === 'dark') {
         document.documentElement.classList.add('dark');
+      } else {
+        document.documentElement.classList.remove('dark');
       }
-
-      // Listen for system theme changes
-      window
-        .matchMedia('(prefers-color-scheme: dark)')
-        .addEventListener('change', (e) => {
-          if (e.matches) {
-            document.documentElement.classList.add('dark');
-          } else {
-            document.documentElement.classList.remove('dark');
-          }
-        });
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
@@ -92,18 +81,36 @@ import '../styles/global.css';
     class="min-h-screen flex items-start justify-center bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-gray-50 transition-colors duration-300 py-8"
   >
     <div class="fixed top-8 right-8 z-10 md:top-4 md:right-4">
-      <div
-        class="flex gap-2 bg-white dark:bg-gray-700 p-1 rounded-lg border border-gray-200 dark:border-gray-600"
-      >
-        <button
-          class="time-format-btn px-4 py-2 rounded-md text-gray-700 dark:text-gray-300 text-sm cursor-pointer transition-all duration-200 hover:text-gray-900 dark:hover:text-gray-50 data-active:bg-gray-100 data-active:dark:bg-gray-900 data-active:font-bold"
-          data-format="24"
-          data-active>24H</button
+      <div class="flex gap-2">
+        <div
+          class="flex gap-2 bg-white dark:bg-gray-700 p-1 rounded-lg border border-gray-200 dark:border-gray-600"
         >
+          <button
+            class="time-format-btn px-4 py-2 rounded-md text-gray-700 dark:text-gray-300 text-sm cursor-pointer transition-all duration-200 hover:text-gray-900 dark:hover:text-gray-50 data-active:bg-gray-100 data-active:dark:bg-gray-900 data-active:font-bold"
+            data-format="24"
+            data-active>24H</button
+          >
+          <button
+            class="time-format-btn px-4 py-2 rounded-md text-gray-700 dark:text-gray-300 text-sm cursor-pointer transition-all duration-200 hover:text-gray-900 dark:hover:text-gray-50 data-active:bg-gray-100 data-active:dark:bg-gray-900 data-active:font-bold"
+            data-format="12">12H</button
+          >
+        </div>
         <button
-          class="time-format-btn px-4 py-2 rounded-md text-gray-700 dark:text-gray-300 text-sm cursor-pointer transition-all duration-200 hover:text-gray-900 dark:hover:text-gray-50 data-active:bg-gray-100 data-active:dark:bg-gray-900 data-active:font-bold"
-          data-format="12">12H</button
+          id="theme-toggle"
+          class="bg-white dark:bg-gray-700 p-2 rounded-lg border border-gray-200 dark:border-gray-600 text-gray-700 dark:text-gray-300 cursor-pointer transition-all duration-200 hover:text-gray-900 dark:hover:text-gray-50"
+          aria-label="Toggle theme"
         >
+          <img
+            src="../assets/icons/light-mode.svg"
+            alt="Light mode"
+            class="dark:hidden w-6 h-6"
+          />
+          <img
+            src="../assets/icons/dark-mode.svg"
+            alt="Dark mode"
+            class="hidden dark:block w-6 h-6"
+          />
+        </button>
       </div>
     </div>
     <div class="w-full max-w-7xl px-8 md:px-4">
