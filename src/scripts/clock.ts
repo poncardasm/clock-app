@@ -10,19 +10,6 @@ type ZoneOption = {
 
 type DstStatus = 'normal' | 'ambiguous' | 'invalid-adjusted';
 
-type ConverterInput = {
-  date: string;
-  time: string;
-  sourceTimeZone: string;
-  targetTimeZone: string;
-};
-
-type ConversionResult = {
-  instant: Date;
-  status: DstStatus;
-  adjustedWall?: WallTime;
-};
-
 type WallTime = {
   year: number;
   month: number;
@@ -35,26 +22,32 @@ type ZonedDateTimeParts = WallTime & {
   second: number;
 };
 
+type ConversionResult = {
+  instant: Date;
+  status: DstStatus;
+  adjustedWall?: WallTime;
+};
+
+type ConverterState = {
+  sourceTimeZone: string;
+  targetTimeZone: string;
+  date: string;
+  time: string;
+};
+
 type ConverterElements = {
-  form: HTMLFormElement;
-  dateInput: HTMLInputElement;
-  timeInput: HTMLInputElement;
-  sourceSelect: HTMLSelectElement;
-  targetSelect: HTMLSelectElement;
   swapButton: HTMLButtonElement;
-  result: HTMLElement;
-  sourceLabel: HTMLElement;
+  sourceSelect: HTMLSelectElement;
   sourceZoneName: HTMLElement;
-  sourceTime: HTMLElement;
-  sourcePeriod: HTMLElement;
-  sourceDate: HTMLElement;
-  targetLabel: HTMLElement;
+  sourceTimeInput: HTMLInputElement;
+  sourceDateDisplay: HTMLButtonElement;
+  sourceDateInput: HTMLInputElement;
+  targetSelect: HTMLSelectElement;
   targetZoneName: HTMLElement;
   targetTime: HTMLElement;
   targetPeriod: HTMLElement;
   targetDate: HTMLElement;
   relative: HTMLElement;
-  error: HTMLElement;
   hint: HTMLElement;
 };
 
@@ -137,12 +130,10 @@ const CONVERTER_STORAGE_KEY = 'clock-converter-state';
 const DEFAULT_SOURCE_TIMEZONE = 'UTC';
 const DEFAULT_TARGET_TIMEZONE = 'Europe/Helsinki';
 
-// Time format state
 let is24Hour = true;
 let converterElements: ConverterElements | null = null;
-let lastConvertedTargetWall: { date: string; time: string } | null = null;
+let converterState: ConverterState | null = null;
 
-// Format options for clock time display
 function getClockTimeOptions(): Intl.DateTimeFormatOptions {
   return {
     hour: '2-digit',
@@ -152,7 +143,6 @@ function getClockTimeOptions(): Intl.DateTimeFormatOptions {
   };
 }
 
-// Format options for converted time display
 function getConverterTimeOptions(): Intl.DateTimeFormatOptions {
   return {
     hour: '2-digit',
@@ -161,7 +151,6 @@ function getConverterTimeOptions(): Intl.DateTimeFormatOptions {
   };
 }
 
-// Format options for date display
 const dateOptions: Intl.DateTimeFormatOptions = {
   weekday: 'short',
   year: 'numeric',
@@ -173,7 +162,6 @@ function pad2(value: number): string {
   return value.toString().padStart(2, '0');
 }
 
-// Function to determine if it's day or night
 function isDaytime(hour: number): boolean {
   return hour >= 6 && hour < 18;
 }
@@ -290,6 +278,17 @@ function formatTimeInputValue(wall: WallTime): string {
   return `${pad2(wall.hour)}:${pad2(wall.minute)}`;
 }
 
+function formatWallDateLabel(wall: WallTime): string {
+  const date = new Date(Date.UTC(wall.year, wall.month - 1, wall.day, 12));
+  return date.toLocaleDateString('en-US', {
+    weekday: 'long',
+    year: 'numeric',
+    month: 'long',
+    day: 'numeric',
+    timeZone: 'UTC',
+  });
+}
+
 function formatWallForHint(wall: WallTime): string {
   return `${formatDateInputValue(wall)} ${formatTimeInputValue(wall)}`;
 }
@@ -320,22 +319,6 @@ function getUtcOffsetLabelAtInstant(date: Date, timeZone: string): string {
   return offsetPart.replace('GMT', 'UTC');
 }
 
-function formatConvertedDateTime(instant: Date, timeZone: string): string {
-  const datePart = instant.toLocaleDateString('en-GB', {
-    timeZone,
-    weekday: 'long',
-    year: 'numeric',
-    month: 'long',
-    day: 'numeric',
-  });
-  const timePart = instant
-    .toLocaleTimeString('en-US', {
-      timeZone,
-      ...getConverterTimeOptions(),
-    })
-    .replace(/am|pm/i, (match) => match.toUpperCase());
-  return `${datePart} at ${timePart}`;
-}
 function formatConverterClockTime(instant: Date, timeZone: string): { time: string; period: string } {
   const formatted = instant
     .toLocaleTimeString('en-US', {
@@ -468,158 +451,6 @@ function resolveSourceInstant(timeZone: string, requestedWall: WallTime): Conver
   };
 }
 
-function getConverterElements(): ConverterElements | null {
-  const form = document.getElementById('converter-form') as HTMLFormElement | null;
-  const dateInput = document.getElementById('converter-date') as HTMLInputElement | null;
-  const timeInput = document.getElementById('converter-time') as HTMLInputElement | null;
-  const sourceSelect = document.getElementById('converter-source-zone') as HTMLSelectElement | null;
-  const targetSelect = document.getElementById('converter-target-zone') as HTMLSelectElement | null;
-  const swapButton = document.getElementById('converter-swap') as HTMLButtonElement | null;
-  const result = document.getElementById('converter-result');
-  const sourceLabel = document.getElementById('converter-source-label');
-  const sourceZoneName = document.getElementById('converter-source-zone-name');
-  const sourceTime = document.getElementById('converter-source-time');
-  const sourcePeriod = document.getElementById('converter-source-period');
-  const sourceDate = document.getElementById('converter-source-date');
-  const targetLabel = document.getElementById('converter-target-label');
-  const targetZoneName = document.getElementById('converter-target-zone-name');
-  const targetTime = document.getElementById('converter-target-time');
-  const targetPeriod = document.getElementById('converter-target-period');
-  const targetDate = document.getElementById('converter-target-date');
-  const relative = document.getElementById('converter-relative');
-  const error = document.getElementById('converter-error');
-  const hint = document.getElementById('converter-hint');
-
-  if (
-    !form ||
-    !dateInput ||
-    !timeInput ||
-    !sourceSelect ||
-    !targetSelect ||
-    !swapButton ||
-    !result ||
-    !sourceLabel ||
-    !sourceZoneName ||
-    !sourceTime ||
-    !sourcePeriod ||
-    !sourceDate ||
-    !targetLabel ||
-    !targetZoneName ||
-    !targetTime ||
-    !targetPeriod ||
-    !targetDate ||
-    !relative ||
-    !error ||
-    !hint
-  ) {
-    return null;
-  }
-
-  return {
-    form,
-    dateInput,
-    timeInput,
-    sourceSelect,
-    targetSelect,
-    swapButton,
-    result,
-    sourceLabel,
-    sourceZoneName,
-    sourceTime,
-    sourcePeriod,
-    sourceDate,
-    targetLabel,
-    targetZoneName,
-    targetTime,
-    targetPeriod,
-    targetDate,
-    relative,
-    error,
-    hint,
-  };
-}
-
-function populateZoneSelect(selectElement: HTMLSelectElement): void {
-  selectElement.innerHTML = '';
-  ZONE_OPTIONS.forEach((zone) => {
-    const option = document.createElement('option');
-    option.value = zone.timeZone;
-    option.textContent = zone.label;
-    selectElement.appendChild(option);
-  });
-}
-
-function loadConverterState(): ConverterInput | null {
-  const raw = localStorage.getItem(CONVERTER_STORAGE_KEY);
-  if (!raw) {
-    return null;
-  }
-
-  try {
-    const parsed = JSON.parse(raw) as ConverterInput;
-    if (
-      typeof parsed.date !== 'string' ||
-      typeof parsed.time !== 'string' ||
-      typeof parsed.sourceTimeZone !== 'string' ||
-      typeof parsed.targetTimeZone !== 'string'
-    ) {
-      return null;
-    }
-
-    if (!isSupportedTimeZone(parsed.sourceTimeZone) || !isSupportedTimeZone(parsed.targetTimeZone)) {
-      return null;
-    }
-
-    if (!parseWallTime(parsed.date, parsed.time)) {
-      return null;
-    }
-
-    return parsed;
-  } catch {
-    return null;
-  }
-}
-
-function saveConverterState(input: ConverterInput): void {
-  localStorage.setItem(CONVERTER_STORAGE_KEY, JSON.stringify(input));
-}
-
-function getDefaultConverterInput(): ConverterInput {
-  const nowParts = getZonedDateTimeParts(new Date(), DEFAULT_SOURCE_TIMEZONE);
-  return {
-    date: formatDateInputValue(partsToWall(nowParts)),
-    time: formatTimeInputValue(partsToWall(nowParts)),
-    sourceTimeZone: DEFAULT_SOURCE_TIMEZONE,
-    targetTimeZone: DEFAULT_TARGET_TIMEZONE,
-  };
-}
-
-function readConverterInput(elements: ConverterElements): ConverterInput | null {
-  const input: ConverterInput = {
-    date: elements.dateInput.value.trim(),
-    time: elements.timeInput.value.trim(),
-    sourceTimeZone: elements.sourceSelect.value,
-    targetTimeZone: elements.targetSelect.value,
-  };
-
-  if (
-    !parseWallTime(input.date, input.time) ||
-    !isSupportedTimeZone(input.sourceTimeZone) ||
-    !isSupportedTimeZone(input.targetTimeZone)
-  ) {
-    return null;
-  }
-
-  return input;
-}
-
-function writeConverterInput(elements: ConverterElements, input: ConverterInput): void {
-  elements.dateInput.value = input.date;
-  elements.timeInput.value = input.time;
-  elements.sourceSelect.value = input.sourceTimeZone;
-  elements.targetSelect.value = input.targetTimeZone;
-}
-
 function buildDstHint(result: ConversionResult, sourceLabel: string): string {
   if (result.status === 'ambiguous') {
     return `The selected time in ${sourceLabel} occurs twice due to daylight saving time. Used the earlier occurrence.`;
@@ -635,90 +466,209 @@ function buildDstHint(result: ConversionResult, sourceLabel: string): string {
   return '';
 }
 
-function clearConverterError(elements: ConverterElements): void {
-  elements.error.textContent = '';
-  elements.error.classList.add('hidden');
+function getConverterElements(): ConverterElements | null {
+  const swapButton = document.getElementById('converter-swap') as HTMLButtonElement | null;
+  const sourceSelect = document.getElementById('converter-source-zone') as HTMLSelectElement | null;
+  const sourceZoneName = document.getElementById('converter-source-zone-name');
+  const sourceTimeInput = document.getElementById('converter-source-time-input') as HTMLInputElement | null;
+  const sourceDateDisplay = document.getElementById('converter-source-date-display') as HTMLButtonElement | null;
+  const sourceDateInput = document.getElementById('converter-source-date-input') as HTMLInputElement | null;
+  const targetSelect = document.getElementById('converter-target-zone') as HTMLSelectElement | null;
+  const targetZoneName = document.getElementById('converter-target-zone-name');
+  const targetTime = document.getElementById('converter-target-time');
+  const targetPeriod = document.getElementById('converter-target-period');
+  const targetDate = document.getElementById('converter-target-date');
+  const relative = document.getElementById('converter-relative');
+  const hint = document.getElementById('converter-hint');
+
+  if (
+    !swapButton ||
+    !sourceSelect ||
+    !sourceZoneName ||
+    !sourceTimeInput ||
+    !sourceDateDisplay ||
+    !sourceDateInput ||
+    !targetSelect ||
+    !targetZoneName ||
+    !targetTime ||
+    !targetPeriod ||
+    !targetDate ||
+    !relative ||
+    !hint
+  ) {
+    return null;
+  }
+
+  return {
+    swapButton,
+    sourceSelect,
+    sourceZoneName,
+    sourceTimeInput,
+    sourceDateDisplay,
+    sourceDateInput,
+    targetSelect,
+    targetZoneName,
+    targetTime,
+    targetPeriod,
+    targetDate,
+    relative,
+    hint,
+  };
 }
 
-function showConverterError(elements: ConverterElements, message: string): void {
-  elements.error.textContent = message;
-  elements.error.classList.remove('hidden');
-  elements.relative.textContent = '';
+function populateZoneSelect(selectElement: HTMLSelectElement): void {
+  selectElement.innerHTML = '';
+  ZONE_OPTIONS.forEach((zone) => {
+    const option = document.createElement('option');
+    option.value = zone.timeZone;
+    option.textContent = zone.label;
+    selectElement.appendChild(option);
+  });
+}
+
+function getDefaultConverterState(): ConverterState {
+  const nowParts = partsToWall(getZonedDateTimeParts(new Date(), DEFAULT_SOURCE_TIMEZONE));
+  return {
+    sourceTimeZone: DEFAULT_SOURCE_TIMEZONE,
+    targetTimeZone: DEFAULT_TARGET_TIMEZONE,
+    date: formatDateInputValue(nowParts),
+    time: formatTimeInputValue(nowParts),
+  };
+}
+
+function loadConverterState(): ConverterState | null {
+  const raw = localStorage.getItem(CONVERTER_STORAGE_KEY);
+  if (!raw) {
+    return null;
+  }
+
+  try {
+    const parsed = JSON.parse(raw) as Partial<ConverterState>;
+    if (
+      typeof parsed.sourceTimeZone !== 'string' ||
+      typeof parsed.targetTimeZone !== 'string' ||
+      typeof parsed.date !== 'string' ||
+      typeof parsed.time !== 'string' ||
+      !isSupportedTimeZone(parsed.sourceTimeZone) ||
+      !isSupportedTimeZone(parsed.targetTimeZone) ||
+      !parseWallTime(parsed.date, parsed.time)
+    ) {
+      return null;
+    }
+
+    return {
+      sourceTimeZone: parsed.sourceTimeZone,
+      targetTimeZone: parsed.targetTimeZone,
+      date: parsed.date,
+      time: parsed.time,
+    };
+  } catch {
+    return null;
+  }
+}
+
+function saveConverterState(state: ConverterState): void {
+  localStorage.setItem(CONVERTER_STORAGE_KEY, JSON.stringify(state));
+}
+
+function updateSelectionHint(elements: ConverterElements, sourceLabel: string, targetLabel: string): void {
+  void sourceLabel;
+  void targetLabel;
+  elements.hint.textContent = '';
 }
 
 function performConversion(elements: ConverterElements, persistState: boolean): void {
-  const input = readConverterInput(elements);
-  if (!input) {
-    showConverterError(elements, 'Enter a valid date, time, and supported time zones.');
-    elements.hint.textContent = '';
+  if (!converterState) {
     return;
   }
 
-  const wall = parseWallTime(input.date, input.time);
-  if (!wall) {
-    showConverterError(elements, 'Enter a valid date and time.');
-    elements.hint.textContent = '';
+  const sourceZone = findZoneByTimeZone(converterState.sourceTimeZone);
+  const targetZone = findZoneByTimeZone(converterState.targetTimeZone);
+  const requestedWall = parseWallTime(converterState.date, converterState.time);
+
+  if (!sourceZone || !targetZone || !requestedWall) {
+    elements.hint.textContent = 'Enter a valid source date and time.';
+    elements.relative.textContent = '';
     return;
   }
 
-  const sourceZone = findZoneByTimeZone(input.sourceTimeZone);
-  const targetZone = findZoneByTimeZone(input.targetTimeZone);
-  if (!sourceZone || !targetZone) {
-    showConverterError(elements, 'Unable to resolve selected time zone.');
-    elements.hint.textContent = '';
-    return;
-  }
+  const result = resolveSourceInstant(sourceZone.timeZone, requestedWall);
+  const sourceWall = partsToWall(getZonedDateTimeParts(result.instant, sourceZone.timeZone));
+  const targetWall = partsToWall(getZonedDateTimeParts(result.instant, targetZone.timeZone));
 
-  clearConverterError(elements);
-  const result = resolveSourceInstant(input.sourceTimeZone, wall);
-  const sourceTimeParts = formatConverterClockTime(result.instant, input.sourceTimeZone);
-  const targetTimeParts = formatConverterClockTime(result.instant, input.targetTimeZone);
-  const sourceDateLabel = formatConverterDate(result.instant, input.sourceTimeZone);
-  const targetDateLabel = formatConverterDate(result.instant, input.targetTimeZone);
-  const sourceTimeZoneName = getTimeZoneNameAtInstant(result.instant, input.sourceTimeZone);
-  const targetTimeZoneName = getTimeZoneNameAtInstant(result.instant, input.targetTimeZone);
-  const sourceWall = partsToWall(getZonedDateTimeParts(result.instant, input.sourceTimeZone));
-  const targetWall = partsToWall(getZonedDateTimeParts(result.instant, input.targetTimeZone));
+  if (result.status === 'invalid-adjusted') {
+    converterState.date = formatDateInputValue(sourceWall);
+    converterState.time = formatTimeInputValue(sourceWall);
+    elements.sourceDateInput.value = converterState.date;
+    elements.sourceTimeInput.value = converterState.time;
+  }
+  elements.sourceDateDisplay.textContent = formatWallDateLabel(sourceWall);
+
+  const targetTimeParts = formatConverterClockTime(result.instant, targetZone.timeZone);
+  const targetDateLabel = formatConverterDate(result.instant, targetZone.timeZone);
+  const sourceTimeZoneName = getTimeZoneNameAtInstant(result.instant, sourceZone.timeZone);
+  const targetTimeZoneName = getTimeZoneNameAtInstant(result.instant, targetZone.timeZone);
+
   const diffMinutes = (wallToMinuteEpoch(targetWall) - wallToMinuteEpoch(sourceWall)) / 60_000;
 
-  elements.sourceLabel.textContent = sourceZone.label;
   elements.sourceZoneName.textContent = sourceTimeZoneName;
-  elements.sourceTime.textContent = sourceTimeParts.time;
-  elements.sourcePeriod.textContent = sourceTimeParts.period;
-  elements.sourceDate.textContent = sourceDateLabel;
-  elements.targetLabel.textContent = targetZone.label;
   elements.targetZoneName.textContent = targetTimeZoneName;
   elements.targetTime.textContent = targetTimeParts.time;
   elements.targetPeriod.textContent = targetTimeParts.period;
   elements.targetDate.textContent = targetDateLabel;
   elements.relative.textContent = describeRelativeTime(sourceZone.label, targetZone.label, diffMinutes);
 
-  elements.hint.textContent = buildDstHint(result, sourceZone.label);
-
-  lastConvertedTargetWall = {
-    date: formatDateInputValue(targetWall),
-    time: formatTimeInputValue(targetWall),
-  };
+  const dstHint = buildDstHint(result, sourceZone.label);
+  if (dstHint) {
+    elements.hint.textContent = `${dstHint} Editing ${sourceZone.label}.`;
+  } else {
+    updateSelectionHint(elements, sourceZone.label, targetZone.label);
+  }
 
   if (persistState) {
-    saveConverterState(input);
+    saveConverterState(converterState);
   }
 }
 
-function swapConverterValues(elements: ConverterElements): void {
-  const currentInput = readConverterInput(elements);
-  if (!currentInput) {
+function syncInputsFromState(elements: ConverterElements): void {
+  if (!converterState) {
     return;
   }
 
-  elements.sourceSelect.value = currentInput.targetTimeZone;
-  elements.targetSelect.value = currentInput.sourceTimeZone;
+  elements.sourceSelect.value = converterState.sourceTimeZone;
+  elements.targetSelect.value = converterState.targetTimeZone;
+  elements.sourceDateInput.value = converterState.date;
+  elements.sourceTimeInput.value = converterState.time;
+  const wall = parseWallTime(converterState.date, converterState.time);
+  elements.sourceDateDisplay.textContent = wall ? formatWallDateLabel(wall) : '';
+}
 
-  if (lastConvertedTargetWall) {
-    elements.dateInput.value = lastConvertedTargetWall.date;
-    elements.timeInput.value = lastConvertedTargetWall.time;
+function updateStateFromInputs(elements: ConverterElements): void {
+  if (!converterState) {
+    return;
   }
 
+  converterState = {
+    ...converterState,
+    sourceTimeZone: elements.sourceSelect.value,
+    targetTimeZone: elements.targetSelect.value,
+    date: elements.sourceDateInput.value,
+    time: elements.sourceTimeInput.value,
+  };
+}
+
+function swapConverterValues(elements: ConverterElements): void {
+  if (!converterState) {
+    return;
+  }
+
+  converterState = {
+    ...converterState,
+    sourceTimeZone: converterState.targetTimeZone,
+    targetTimeZone: converterState.sourceTimeZone,
+  };
+
+  syncInputsFromState(elements);
   performConversion(elements, true);
 }
 
@@ -728,31 +678,34 @@ function initConverter(): void {
     return;
   }
 
+  converterElements = elements;
   populateZoneSelect(elements.sourceSelect);
   populateZoneSelect(elements.targetSelect);
-
-  const initial = loadConverterState() ?? getDefaultConverterInput();
-  writeConverterInput(elements, initial);
-  converterElements = elements;
-
-  elements.form.addEventListener('submit', (event) => {
-    event.preventDefault();
-    performConversion(elements, true);
-  });
-
-  const runLiveConversion = (): void => {
-    performConversion(elements, true);
-  };
-
-  elements.dateInput.addEventListener('input', runLiveConversion);
-  elements.dateInput.addEventListener('change', runLiveConversion);
-  elements.timeInput.addEventListener('input', runLiveConversion);
-  elements.timeInput.addEventListener('change', runLiveConversion);
-  elements.sourceSelect.addEventListener('change', runLiveConversion);
-  elements.targetSelect.addEventListener('change', runLiveConversion);
+  converterState = loadConverterState() ?? getDefaultConverterState();
+  syncInputsFromState(elements);
 
   elements.swapButton.addEventListener('click', () => {
     swapConverterValues(elements);
+  });
+
+  const onInputChange = (): void => {
+    updateStateFromInputs(elements);
+    performConversion(elements, true);
+  };
+
+  elements.sourceTimeInput.addEventListener('input', onInputChange);
+  elements.sourceTimeInput.addEventListener('change', onInputChange);
+  elements.sourceDateInput.addEventListener('input', onInputChange);
+  elements.sourceDateInput.addEventListener('change', onInputChange);
+  elements.sourceSelect.addEventListener('change', onInputChange);
+  elements.targetSelect.addEventListener('change', onInputChange);
+  elements.sourceDateDisplay.addEventListener('click', () => {
+    if (typeof elements.sourceDateInput.showPicker === 'function') {
+      elements.sourceDateInput.showPicker();
+      return;
+    }
+    elements.sourceDateInput.focus();
+    elements.sourceDateInput.click();
   });
 
   performConversion(elements, false);
@@ -766,7 +719,6 @@ function refreshConverterForFormatChange(): void {
   performConversion(converterElements, false);
 }
 
-// Function to update a single clock
 function updateClock(zone: ZoneOption, now: Date): void {
   const parts = getZonedDateTimeParts(now, zone.timeZone);
 
@@ -805,7 +757,6 @@ function updateClocks(): void {
   ZONE_OPTIONS.forEach((zone) => updateClock(zone, now));
 }
 
-// Handle time format toggle
 document.querySelectorAll('.time-format-btn').forEach((button) => {
   button.addEventListener('click', () => {
     document.querySelectorAll('.time-format-btn').forEach((btn) => btn.removeAttribute('data-active'));
@@ -819,7 +770,6 @@ document.querySelectorAll('.time-format-btn').forEach((button) => {
   });
 });
 
-// Handle theme toggle
 const themeToggle = document.getElementById('theme-toggle');
 if (themeToggle) {
   themeToggle.addEventListener('click', () => {

@@ -117,4 +117,46 @@
   box-shadow: 0 0 0 2px var(--ring);
 }
 
+.converter-input {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  outline: none;
+}
 
+.converter-input:focus {
+  box-shadow: inset 0 -2px 0 0 var(--ring);
+}
+
+.converter-zone-select {
+  width: 100%;
+  border: 0;
+  background: transparent;
+  padding: 0;
+  outline: none;
+  appearance: none;
+  cursor: pointer;
+}
+
+.converter-zone-select:focus {
+  box-shadow: inset 0 -2px 0 0 var(--ring);
+}
+
+.converter-date-display {
+  cursor: pointer;
+}
+
+.converter-input[type='time']::-webkit-calendar-picker-indicator {
+  display: none;
+}
+
+.converter-date-input-anchor {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
+}
