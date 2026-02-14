@@ -114,6 +114,188 @@ import '../styles/global.css';
           </button>
         </div>
       </div>
+      <div class="max-w-[calc(3*280px+2*1.5rem+4rem)] mx-auto mb-6">
+        <section
+          class="bg-card dark:bg-card rounded-xl border border-border dark:border-border px-6 py-5 md:px-4 md:py-4"
+          aria-labelledby="converter-title"
+        >
+          <h2
+            id="converter-title"
+            class="text-lg font-semibold text-card-foreground dark:text-card-foreground mb-4"
+          >
+            Time Zone Converter
+          </h2>
+          <form
+            id="converter-form"
+            class="space-y-3"
+          >
+            <div class="grid grid-cols-1 lg:grid-cols-2 gap-3">
+              <fieldset class="rounded-lg border border-border/70 dark:border-border/70 bg-muted/35 dark:bg-muted/25 p-3">
+                <legend class="px-1 text-xs uppercase tracking-wider text-muted-foreground">Step 1</legend>
+                <p class="text-sm font-semibold text-card-foreground dark:text-card-foreground">
+                  Source date and time
+                </p>
+                <p class="mt-1 text-xs text-muted-foreground">
+                  The local date and time in the selected source country.
+                </p>
+                <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <label class="flex flex-col gap-1 text-sm text-muted-foreground">
+                    Date
+                    <input
+                      id="converter-date"
+                      type="date"
+                      class="h-11 rounded-md border border-border bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                      required
+                    />
+                  </label>
+                  <label class="flex flex-col gap-1 text-sm text-muted-foreground">
+                    Time
+                    <input
+                      id="converter-time"
+                      type="time"
+                      step="60"
+                      class="h-11 rounded-md border border-border bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                      required
+                    />
+                  </label>
+                </div>
+              </fieldset>
+
+              <fieldset class="rounded-lg border border-border/70 dark:border-border/70 bg-muted/35 dark:bg-muted/25 p-3">
+                <legend class="px-1 text-xs uppercase tracking-wider text-muted-foreground">Step 2</legend>
+                <p class="text-sm font-semibold text-card-foreground dark:text-card-foreground">
+                  Choose countries
+                </p>
+                <p class="mt-1 text-xs text-muted-foreground">
+                  Convert from the source country to the target country.
+                </p>
+                <div class="mt-3 grid grid-cols-1 sm:grid-cols-2 gap-2">
+                  <label class="flex flex-col gap-1 text-sm text-muted-foreground">
+                    From country
+                    <select
+                      id="converter-source-zone"
+                      class="h-11 rounded-md border border-border bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                      required
+                    >
+                    </select>
+                  </label>
+                  <label class="flex flex-col gap-1 text-sm text-muted-foreground">
+                    To country
+                    <select
+                      id="converter-target-zone"
+                      class="h-11 rounded-md border border-border bg-background px-3 text-sm text-foreground focus:outline-none focus:ring-2 focus:ring-ring"
+                      required
+                    >
+                    </select>
+                  </label>
+                </div>
+              </fieldset>
+            </div>
+
+          </form>
+          <section id="converter-result" class="mt-5 space-y-3">
+            <h3
+              id="converter-result-title"
+              class="text-3xl font-semibold text-card-foreground dark:text-card-foreground tracking-tight md:text-2xl"
+            >
+              Time Comparison
+            </h3>
+            <div class="h-1 w-44 rounded-full bg-amber-400 dark:bg-amber-500"></div>
+
+            <div class="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-3 items-center">
+              <article
+                class="rounded-xl border border-border dark:border-border bg-muted/60 dark:bg-muted/50 px-5 py-4"
+              >
+                <p
+                  id="converter-source-label"
+                  class="text-3xl font-semibold text-card-foreground dark:text-card-foreground md:text-2xl"
+                >
+                </p>
+                <p
+                  id="converter-source-zone-name"
+                  class="mt-1 text-xs font-mono text-muted-foreground dark:text-muted-foreground"
+                >
+                </p>
+                <div class="mt-3 flex items-start gap-1">
+                  <p
+                    id="converter-source-time"
+                    class="text-6xl font-mono font-medium leading-none tracking-tight text-foreground dark:text-card-foreground md:text-5xl"
+                  >
+                  </p>
+                  <p
+                    id="converter-source-period"
+                    class="pt-1 text-xl font-semibold text-muted-foreground dark:text-muted-foreground md:text-lg"
+                  >
+                  </p>
+                </div>
+                <p
+                  id="converter-source-date"
+                  class="mt-3 text-base text-muted-foreground dark:text-muted-foreground md:text-sm"
+                >
+                </p>
+              </article>
+
+              <button
+                id="converter-swap"
+                type="button"
+                class="h-14 w-14 text-center cursor-pointer transition-all duration-200 hover:scale-105 focus:outline-none focus:ring-2 focus:ring-ring flex items-center justify-center"
+                aria-label="Swap source and target countries"
+                title="Swap source and target countries"
+              >
+                <img src="/assets/icons/swap.svg" alt="" class="h-10 w-10 opacity-80 dark:opacity-90" />
+              </button>
+
+              <article
+                class="rounded-xl border border-border dark:border-border bg-muted/60 dark:bg-muted/50 px-5 py-4"
+              >
+                <p
+                  id="converter-target-label"
+                  class="text-3xl font-semibold text-card-foreground dark:text-card-foreground md:text-2xl"
+                >
+                </p>
+                <p
+                  id="converter-target-zone-name"
+                  class="mt-1 text-xs font-mono text-muted-foreground dark:text-muted-foreground"
+                >
+                </p>
+                <div class="mt-3 flex items-start gap-1">
+                  <p
+                    id="converter-target-time"
+                    class="text-6xl font-mono font-medium leading-none tracking-tight text-foreground dark:text-card-foreground md:text-5xl"
+                  >
+                  </p>
+                  <p
+                    id="converter-target-period"
+                    class="pt-1 text-xl font-semibold text-muted-foreground dark:text-muted-foreground md:text-lg"
+                  >
+                  </p>
+                </div>
+                <p
+                  id="converter-target-date"
+                  class="mt-3 text-base text-muted-foreground dark:text-muted-foreground md:text-sm"
+                >
+                </p>
+              </article>
+            </div>
+
+            <p
+              id="converter-relative"
+              class="rounded-md bg-amber-300/80 dark:bg-amber-500/70 px-3 py-2 text-sm text-amber-950 dark:text-gray-950"
+            >
+            </p>
+            <p
+              id="converter-error"
+              class="hidden text-sm text-red-600 dark:text-red-400 font-medium"
+            >
+            </p>
+            <p
+              id="converter-hint"
+              class="min-h-5 text-xs text-muted-foreground dark:text-muted-foreground"
+            >
+            </p>
+          </section>
+        </section>
+      </div>
       <!-- Clock Cards Container -->
       <div
         id="clock-grid"
