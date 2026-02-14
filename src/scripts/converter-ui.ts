@@ -45,6 +45,58 @@ let zoneListHideTimers: Partial<Record<ZoneRole, number>> = {};
 let zoneListActiveIndex: Partial<Record<ZoneRole, number>> = {};
 let is24HourState = true;
 
+function pad2(value: number): string {
+  return value.toString().padStart(2, '0');
+}
+
+function formatSourceTimeForDisplay(time24: string, is24Hour: boolean): string {
+  const match = /^(\d{2}):(\d{2})$/.exec(time24);
+  if (!match) {
+    return time24;
+  }
+
+  const hour = Number(match[1]);
+  const minute = Number(match[2]);
+  if (is24Hour) {
+    return `${pad2(hour)}:${pad2(minute)}`;
+  }
+
+  const period = hour >= 12 ? 'PM' : 'AM';
+  const hour12 = hour % 12 || 12;
+  return `${hour12}:${pad2(minute)} ${period}`;
+}
+
+function parseSourceTimeTo24(value: string): string | null {
+  const normalized = value.trim().toUpperCase();
+  if (!normalized) {
+    return null;
+  }
+
+  const hhmm = /^(\d{1,2}):(\d{2})$/.exec(normalized);
+  if (hhmm) {
+    const hour = Number(hhmm[1]);
+    const minute = Number(hhmm[2]);
+    if (hour >= 0 && hour <= 23 && minute >= 0 && minute <= 59) {
+      return `${pad2(hour)}:${pad2(minute)}`;
+    }
+  }
+
+  const hhmmMeridiem = /^(\d{1,2}):(\d{2})\s*([AP]M)$/.exec(normalized);
+  if (hhmmMeridiem) {
+    const hour = Number(hhmmMeridiem[1]);
+    const minute = Number(hhmmMeridiem[2]);
+    if (hour < 1 || hour > 12 || minute < 0 || minute > 59) {
+      return null;
+    }
+
+    const convertedHour =
+      hhmmMeridiem[3] === 'PM' ? (hour % 12) + 12 : hour % 12;
+    return `${pad2(convertedHour)}:${pad2(minute)}`;
+  }
+
+  return null;
+}
+
 function getConverterElements(): ConverterElements | null {
   const swapButton = document.getElementById('converter-swap') as HTMLButtonElement | null;
   const sourceZoneInput = document.getElementById('converter-source-zone') as HTMLInputElement | null;
@@ -197,6 +249,7 @@ function renderFromState(
   elements: ConverterElements,
   state: ConverterState,
   persistState: boolean,
+  preserveSourceTimeInput = false,
 ): void {
   converterState = state;
 
@@ -209,14 +262,26 @@ function renderFromState(
 
   converterState = view.state;
   elements.sourceDateInput.value = view.state.date;
-  elements.sourceTimeInput.value = view.state.time;
+  if (!preserveSourceTimeInput) {
+    elements.sourceTimeInput.value = formatSourceTimeForDisplay(
+      view.state.time,
+      is24HourState,
+    );
+  }
   elements.sourceDateDisplay.textContent = view.sourceDateDisplay;
   elements.sourceZoneName.textContent = view.sourceZoneName;
   elements.targetZoneName.textContent = view.targetZoneName;
-  elements.targetTime.textContent = view.targetTime;
-  elements.targetPeriod.textContent = view.targetPeriod;
+  elements.targetTime.textContent = view.targetPeriod
+    ? `${view.targetTime} ${view.targetPeriod}`
+    : view.targetTime;
+  elements.targetPeriod.textContent = '';
   elements.targetDate.textContent = view.targetDate;
-  elements.relative.textContent = view.relative;
+  elements.relative.textContent = '';
+  elements.relative.append(document.createTextNode(view.relativeText));
+  const emphasis = document.createElement('strong');
+  emphasis.textContent = view.relativeEmphasis;
+  elements.relative.append(emphasis);
+  elements.relative.append(document.createTextNode(view.relativeTail));
   elements.hint.textContent = view.hint;
 
   if (persistState) {
@@ -305,7 +370,10 @@ function syncInputsFromState(elements: ConverterElements, state: ConverterState)
   elements.sourceZoneInput.value = formatZoneInputValue(state.sourceTimeZone);
   elements.targetZoneInput.value = formatZoneInputValue(state.targetTimeZone);
   elements.sourceDateInput.value = state.date;
-  elements.sourceTimeInput.value = state.time;
+  elements.sourceTimeInput.value = formatSourceTimeForDisplay(
+    state.time,
+    is24HourState,
+  );
 
   const wall = parseWallTime(state.date, state.time);
   elements.sourceDateDisplay.textContent = wall ? formatWallDateLabel(wall) : '';
@@ -422,24 +490,39 @@ export function initConverter(getIs24Hour: () => boolean): void {
     swapConverterValues(elements);
   });
 
-  const onDateTimeChange = (): void => {
+  const onDateTimeChange = (preserveSourceTimeInput = false): void => {
     if (!converterState) {
+      return;
+    }
+
+    const parsedTime = parseSourceTimeTo24(elements.sourceTimeInput.value);
+    if (!parsedTime) {
+      elements.hint.textContent =
+        'Enter time as HH:MM (24H) or h:MM AM/PM (12H).';
       return;
     }
 
     const nextState: ConverterState = {
       ...converterState,
       date: elements.sourceDateInput.value,
-      time: elements.sourceTimeInput.value,
+      time: parsedTime,
     };
 
-    renderFromState(elements, nextState, true);
+    renderFromState(elements, nextState, true, preserveSourceTimeInput);
   };
 
-  elements.sourceTimeInput.addEventListener('input', onDateTimeChange);
-  elements.sourceTimeInput.addEventListener('change', onDateTimeChange);
-  elements.sourceDateInput.addEventListener('input', onDateTimeChange);
-  elements.sourceDateInput.addEventListener('change', onDateTimeChange);
+  elements.sourceTimeInput.addEventListener('input', () => {
+    onDateTimeChange(true);
+  });
+  elements.sourceTimeInput.addEventListener('change', () => {
+    onDateTimeChange(false);
+  });
+  elements.sourceDateInput.addEventListener('input', () => {
+    onDateTimeChange(false);
+  });
+  elements.sourceDateInput.addEventListener('change', () => {
+    onDateTimeChange(false);
+  });
 
   attachZoneInputEvents(elements, 'source');
   attachZoneInputEvents(elements, 'target');

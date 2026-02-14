@@ -6,10 +6,10 @@ import {
 import {
   type ConversionResult,
   buildDstHint,
-  describeRelativeTime,
   formatConverterClockTime,
   formatConverterDate,
   formatDateInputValue,
+  formatHourMinuteDifference,
   formatTimeInputValue,
   formatWallDateLabel,
   getTimeZoneNameAtInstant,
@@ -39,7 +39,9 @@ export type ConverterViewData = {
   targetTime: string;
   targetPeriod: string;
   targetDate: string;
-  relative: string;
+  relativeText: string;
+  relativeEmphasis: string;
+  relativeTail: string;
   hint: string;
   sourceDateDisplay: string;
 };
@@ -132,6 +134,19 @@ export function computeConverterViewData(
 
   const diffMinutes = (wallToMinuteEpoch(targetWall) - wallToMinuteEpoch(sourceWall)) / 60_000;
 
+  let relativeBase = `${targetZone.label} time is `;
+  let relativeEmphasis: string;
+  let relativeTail = ` of ${sourceZone.label}.`;
+
+  if (diffMinutes === 0) {
+    relativeBase = `${targetZone.label} and ${sourceZone.label} currently `;
+    relativeEmphasis = 'share the same local time';
+    relativeTail = '.';
+  } else {
+    const diffText = formatHourMinuteDifference(diffMinutes);
+    relativeEmphasis = diffMinutes > 0 ? `${diffText} ahead` : `${diffText} behind`;
+  }
+
   return {
     state: nextState,
     sourceZoneName: sourceTimeZoneName,
@@ -139,7 +154,9 @@ export function computeConverterViewData(
     targetTime: targetTimeParts.time,
     targetPeriod: targetTimeParts.period,
     targetDate: targetDateLabel,
-    relative: describeRelativeTime(sourceZone.label, targetZone.label, diffMinutes),
+    relativeText: relativeBase,
+    relativeEmphasis,
+    relativeTail,
     hint: buildDstHint(result, sourceZone.label),
     sourceDateDisplay: formatWallDateLabel(sourceWall),
   };

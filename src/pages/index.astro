@@ -136,10 +136,10 @@ import '../styles/global.css';
           </p>
           <section id="converter-result" class="mt-5 space-y-3">
             <div
-              class="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-3 items-center"
+              class="grid grid-cols-1 md:grid-cols-[1fr_auto_1fr] gap-3 items-stretch"
             >
               <article
-                class="rounded-xl border border-border dark:border-border bg-muted/60 dark:bg-muted/50 px-5 py-4"
+                class="rounded-xl border border-border dark:border-border bg-muted/60 dark:bg-muted/50 px-5 py-4 h-full flex flex-col"
               >
                 <div class="converter-zone-picker">
                   <input
@@ -165,12 +165,13 @@ import '../styles/global.css';
                 </p>
                 <input
                   id="converter-source-time-input"
-                  type="time"
-                  step="60"
+                  type="text"
                   class="converter-input mt-3 text-6xl font-mono font-medium leading-none tracking-tight text-foreground dark:text-card-foreground md:text-5xl"
                   aria-label="Source time"
+                  autocomplete="off"
+                  spellcheck="false"
                 />
-                <div class="relative mt-3">
+                <div class="relative mt-auto pt-3">
                   <button
                     id="converter-source-date-display"
                     type="button"
@@ -190,7 +191,7 @@ import '../styles/global.css';
               <button
                 id="converter-swap"
                 type="button"
-                class="h-14 w-14 text-center cursor-pointer transition-all duration-200 hover:scale-105 focus:outline-none flex items-center justify-center"
+                class="h-14 w-14 text-center cursor-pointer transition-all duration-200 hover:scale-105 focus:outline-none flex items-center justify-center self-center"
                 aria-label="Swap source and target countries"
                 title="Swap source and target countries"
               >
@@ -204,7 +205,7 @@ import '../styles/global.css';
               </button>
 
               <article
-                class="rounded-xl border border-border dark:border-border bg-muted/60 dark:bg-muted/50 px-5 py-4"
+                class="rounded-xl border border-border dark:border-border bg-muted/60 dark:bg-muted/50 px-5 py-4 h-full flex flex-col"
               >
                 <div class="converter-zone-picker">
                   <input
@@ -236,13 +237,13 @@ import '../styles/global.css';
                   </p>
                   <p
                     id="converter-target-period"
-                    class="pt-1 text-xl font-semibold text-muted-foreground dark:text-muted-foreground md:text-lg"
+                    class="hidden"
                   >
                   </p>
                 </div>
                 <p
                   id="converter-target-date"
-                  class="mt-3 text-base text-muted-foreground dark:text-muted-foreground md:text-sm"
+                  class="mt-auto pt-3 text-base text-muted-foreground dark:text-muted-foreground md:text-sm"
                 >
                 </p>
               </article>
