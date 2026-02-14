@@ -43,7 +43,6 @@ type ConverterElements = {
   targetSelect: HTMLSelectElement;
   swapButton: HTMLButtonElement;
   result: HTMLElement;
-  resultTitle: HTMLElement;
   sourceLabel: HTMLElement;
   sourceZoneName: HTMLElement;
   sourceTime: HTMLElement;
@@ -477,7 +476,6 @@ function getConverterElements(): ConverterElements | null {
   const targetSelect = document.getElementById('converter-target-zone') as HTMLSelectElement | null;
   const swapButton = document.getElementById('converter-swap') as HTMLButtonElement | null;
   const result = document.getElementById('converter-result');
-  const resultTitle = document.getElementById('converter-result-title');
   const sourceLabel = document.getElementById('converter-source-label');
   const sourceZoneName = document.getElementById('converter-source-zone-name');
   const sourceTime = document.getElementById('converter-source-time');
@@ -500,7 +498,6 @@ function getConverterElements(): ConverterElements | null {
     !targetSelect ||
     !swapButton ||
     !result ||
-    !resultTitle ||
     !sourceLabel ||
     !sourceZoneName ||
     !sourceTime ||
@@ -526,7 +523,6 @@ function getConverterElements(): ConverterElements | null {
     targetSelect,
     swapButton,
     result,
-    resultTitle,
     sourceLabel,
     sourceZoneName,
     sourceTime,
@@ -685,7 +681,6 @@ function performConversion(elements: ConverterElements, persistState: boolean): 
   const targetWall = partsToWall(getZonedDateTimeParts(result.instant, input.targetTimeZone));
   const diffMinutes = (wallToMinuteEpoch(targetWall) - wallToMinuteEpoch(sourceWall)) / 60_000;
 
-  elements.resultTitle.textContent = `Time in ${sourceZone.label} vs ${targetZone.label}`;
   elements.sourceLabel.textContent = sourceZone.label;
   elements.sourceZoneName.textContent = sourceTimeZoneName;
   elements.sourceTime.textContent = sourceTimeParts.time;
