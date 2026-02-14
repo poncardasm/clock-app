@@ -25,6 +25,8 @@ type ConverterElements = {
   sourceZoneList: HTMLElement;
   sourceZoneName: HTMLElement;
   sourceTimeInput: HTMLInputElement;
+  sourceTimePicker: HTMLInputElement;
+  sourceTimeSelection: HTMLElement;
   sourceDateDisplay: HTMLButtonElement;
   sourceDateInput: HTMLInputElement;
   targetZoneInput: HTMLInputElement;
@@ -49,7 +51,7 @@ function pad2(value: number): string {
   return value.toString().padStart(2, '0');
 }
 
-function formatSourceTimeForDisplay(time24: string, is24Hour: boolean): string {
+function formatSourceTimeForDisplay(time24: string): string {
   const match = /^(\d{2}):(\d{2})$/.exec(time24);
   if (!match) {
     return time24;
@@ -57,12 +59,14 @@ function formatSourceTimeForDisplay(time24: string, is24Hour: boolean): string {
 
   const hour = Number(match[1]);
   const minute = Number(match[2]);
-  if (is24Hour) {
+  
+  if (is24HourState) {
     return `${pad2(hour)}:${pad2(minute)}`;
   }
-
+  
+  // 12-hour format
   const period = hour >= 12 ? 'PM' : 'AM';
-  const hour12 = hour % 12 || 12;
+  const hour12 = hour === 0 ? 12 : hour > 12 ? hour - 12 : hour;
   return `${hour12}:${pad2(minute)} ${period}`;
 }
 
@@ -103,6 +107,8 @@ function getConverterElements(): ConverterElements | null {
   const sourceZoneList = document.getElementById('converter-source-zone-list');
   const sourceZoneName = document.getElementById('converter-source-zone-name');
   const sourceTimeInput = document.getElementById('converter-source-time-input') as HTMLInputElement | null;
+  const sourceTimePicker = document.getElementById('converter-source-time-picker') as HTMLInputElement | null;
+  const sourceTimeSelection = document.getElementById('converter-source-time-selection');
   const sourceDateDisplay = document.getElementById('converter-source-date-display') as HTMLButtonElement | null;
   const sourceDateInput = document.getElementById('converter-source-date-input') as HTMLInputElement | null;
   const targetZoneInput = document.getElementById('converter-target-zone') as HTMLInputElement | null;
@@ -120,6 +126,8 @@ function getConverterElements(): ConverterElements | null {
     !sourceZoneList ||
     !sourceZoneName ||
     !sourceTimeInput ||
+    !sourceTimePicker ||
+    !sourceTimeSelection ||
     !sourceDateDisplay ||
     !sourceDateInput ||
     !targetZoneInput ||
@@ -140,6 +148,8 @@ function getConverterElements(): ConverterElements | null {
     sourceZoneList,
     sourceZoneName,
     sourceTimeInput,
+    sourceTimePicker,
+    sourceTimeSelection,
     sourceDateDisplay,
     sourceDateInput,
     targetZoneInput,
@@ -263,11 +273,10 @@ function renderFromState(
   converterState = view.state;
   elements.sourceDateInput.value = view.state.date;
   if (!preserveSourceTimeInput) {
-    elements.sourceTimeInput.value = formatSourceTimeForDisplay(
-      view.state.time,
-      is24HourState,
-    );
+    elements.sourceTimeInput.value = formatSourceTimeForDisplay(view.state.time);
   }
+  elements.sourceTimePicker.value = view.state.time;
+  elements.sourceTimeSelection.textContent = formatSourceTimeForDisplay(view.state.time);
   elements.sourceDateDisplay.textContent = view.sourceDateDisplay;
   elements.sourceZoneName.textContent = view.sourceZoneName;
   elements.targetZoneName.textContent = view.targetZoneName;
@@ -370,10 +379,9 @@ function syncInputsFromState(elements: ConverterElements, state: ConverterState)
   elements.sourceZoneInput.value = formatZoneInputValue(state.sourceTimeZone);
   elements.targetZoneInput.value = formatZoneInputValue(state.targetTimeZone);
   elements.sourceDateInput.value = state.date;
-  elements.sourceTimeInput.value = formatSourceTimeForDisplay(
-    state.time,
-    is24HourState,
-  );
+  elements.sourceTimeInput.value = formatSourceTimeForDisplay(state.time);
+  elements.sourceTimePicker.value = state.time;
+  elements.sourceTimeSelection.textContent = formatSourceTimeForDisplay(state.time);
 
   const wall = parseWallTime(state.date, state.time);
   elements.sourceDateDisplay.textContent = wall ? formatWallDateLabel(wall) : '';
@@ -497,8 +505,7 @@ export function initConverter(getIs24Hour: () => boolean): void {
 
     const parsedTime = parseSourceTimeTo24(elements.sourceTimeInput.value);
     if (!parsedTime) {
-      elements.hint.textContent =
-        'Enter time as HH:MM (24H) or h:MM AM/PM (12H).';
+      elements.hint.textContent = 'Select a valid source time.';
       return;
     }
 
@@ -515,6 +522,24 @@ export function initConverter(getIs24Hour: () => boolean): void {
     onDateTimeChange(true);
   });
   elements.sourceTimeInput.addEventListener('change', () => {
+    onDateTimeChange(false);
+  });
+  elements.sourceTimeInput.addEventListener('focus', () => {
+    if (typeof elements.sourceTimePicker.showPicker === 'function') {
+      elements.sourceTimePicker.showPicker();
+    }
+  });
+  elements.sourceTimeInput.addEventListener('click', () => {
+    if (typeof elements.sourceTimePicker.showPicker === 'function') {
+      elements.sourceTimePicker.showPicker();
+    }
+  });
+  elements.sourceTimePicker.addEventListener('input', () => {
+    elements.sourceTimeInput.value = formatSourceTimeForDisplay(elements.sourceTimePicker.value);
+    onDateTimeChange(false);
+  });
+  elements.sourceTimePicker.addEventListener('change', () => {
+    elements.sourceTimeInput.value = formatSourceTimeForDisplay(elements.sourceTimePicker.value);
     onDateTimeChange(false);
   });
   elements.sourceDateInput.addEventListener('input', () => {

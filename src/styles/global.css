@@ -182,8 +182,26 @@
   cursor: pointer;
 }
 
+.converter-time-display:focus {
+  box-shadow: none;
+}
+
 .converter-input[type='time']::-webkit-calendar-picker-indicator {
   display: none;
+}
+
+.converter-input[type='time']:focus {
+  box-shadow: none;
+}
+
+.converter-time-input-anchor {
+  position: absolute;
+  top: calc(100% + 2px);
+  left: 0;
+  width: 1px;
+  height: 1px;
+  opacity: 0;
+  pointer-events: none;
 }
 
 .converter-date-input-anchor {
@@ -194,4 +212,21 @@
   height: 1px;
   opacity: 0;
   pointer-events: none;
+}
+
+/* Theme toggle icon visibility */
+#theme-toggle .material-symbols-rounded:first-child {
+  display: block;
+}
+
+#theme-toggle .material-symbols-rounded:last-child {
+  display: none;
+}
+
+.dark #theme-toggle .material-symbols-rounded:first-child {
+  display: none;
+}
+
+.dark #theme-toggle .material-symbols-rounded:last-child {
+  display: block;
 }

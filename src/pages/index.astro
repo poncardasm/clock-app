@@ -58,8 +58,6 @@ import '../styles/global.css';
       const savedTheme = localStorage.getItem('theme');
       if (savedTheme === 'dark') {
         document.documentElement.classList.add('dark');
-      } else {
-        document.documentElement.classList.remove('dark');
       }
     </script>
     <link rel="preconnect" href="https://fonts.googleapis.com" />
@@ -91,28 +89,28 @@ import '../styles/global.css';
             class="flex gap-2 bg-card dark:bg-card p-1 rounded-lg border border-border dark:border-border"
           >
             <button
-              class="time-format-btn px-4 py-2 rounded-md text-secondary-foreground dark:text-secondary-foreground text-sm cursor-pointer transition-all duration-200 hover:text-foreground dark:hover:text-primary-foreground data-active:bg-secondary data-active:dark:bg-secondary data-active:font-bold"
+              class="time-format-btn px-4 py-2 rounded-md text-secondary-foreground dark:text-secondary-foreground text-sm cursor-pointer transition-all duration-200 hover:text-card-foreground dark:hover:text-card-foreground data-active:bg-secondary data-active:dark:bg-secondary data-active:font-bold"
               data-format="24"
               data-active>24H</button
             >
             <button
-              class="time-format-btn px-4 py-2 rounded-md text-secondary-foreground dark:text-secondary-foreground text-sm cursor-pointer transition-all duration-200 hover:text-foreground dark:hover:text-primary-foreground data-active:bg-secondary data-active:dark:bg-secondary data-active:font-bold"
+              class="time-format-btn px-4 py-2 rounded-md text-secondary-foreground dark:text-secondary-foreground text-sm cursor-pointer transition-all duration-200 hover:text-card-foreground dark:hover:text-card-foreground data-active:bg-secondary data-active:dark:bg-secondary data-active:font-bold"
               data-format="12">12H</button
             >
           </div>
           <button
             id="theme-toggle"
-            class="bg-card dark:bg-card p-2 rounded-lg border border-border dark:border-border text-secondary-foreground dark:text-secondary-foreground cursor-pointer transition-all duration-200 hover:text-foreground dark:hover:text-primary-foreground"
+            class="bg-card dark:bg-card p-2 rounded-lg border border-border dark:border-border text-secondary-foreground dark:text-secondary-foreground cursor-pointer transition-all duration-200 hover:text-card-foreground dark:hover:text-card-foreground"
             aria-label="Toggle theme"
           >
             <span
-              class="material-symbols-rounded dark:hidden text-[1.6rem] leading-none"
+              class="material-symbols-rounded text-[1.6rem] leading-none"
               aria-hidden="true"
             >
               light_mode
             </span>
             <span
-              class="material-symbols-rounded hidden dark:block text-[1.6rem] leading-none"
+              class="material-symbols-rounded text-[1.6rem] leading-none"
               aria-hidden="true"
             >
               dark_mode
@@ -163,14 +161,30 @@ import '../styles/global.css';
                   class="mt-1 text-xs font-mono text-muted-foreground dark:text-muted-foreground"
                 >
                 </p>
-                <input
-                  id="converter-source-time-input"
-                  type="text"
-                  class="converter-input mt-3 text-6xl font-mono font-medium leading-none tracking-tight text-foreground dark:text-card-foreground md:text-5xl"
-                  aria-label="Source time"
-                  autocomplete="off"
-                  spellcheck="false"
-                />
+                <div class="relative mt-3">
+                  <input
+                    id="converter-source-time-input"
+                    type="text"
+                    class="converter-input converter-time-display text-6xl font-mono font-medium leading-none tracking-tight text-foreground dark:text-card-foreground md:text-5xl"
+                    aria-label="Source time"
+                    inputmode="numeric"
+                    placeholder="00:00"
+                    autocomplete="off"
+                    spellcheck="false"
+                  />
+                  <input
+                    id="converter-source-time-picker"
+                    type="time"
+                    step="60"
+                    class="converter-time-input-anchor"
+                    aria-label="Source time picker"
+                  />
+                </div>
+                <p
+                  id="converter-source-time-selection"
+                  class="mt-2 text-sm font-mono text-muted-foreground dark:text-muted-foreground"
+                >
+                </p>
                 <div class="relative mt-auto pt-3">
                   <button
                     id="converter-source-date-display"
