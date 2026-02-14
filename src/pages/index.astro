@@ -141,12 +141,23 @@ import '../styles/global.css';
               <article
                 class="rounded-xl border border-border dark:border-border bg-muted/60 dark:bg-muted/50 px-5 py-4"
               >
-                <select
-                  id="converter-source-zone"
-                  class="converter-zone-select text-3xl font-semibold text-card-foreground dark:text-card-foreground md:text-2xl"
-                  aria-label="Source city and country"
-                >
-                </select>
+                <div class="converter-zone-picker">
+                  <input
+                    id="converter-source-zone"
+                    type="text"
+                    class="converter-zone-input text-3xl font-semibold text-card-foreground dark:text-card-foreground md:text-2xl"
+                    aria-label="Source city and country"
+                    autocomplete="off"
+                    spellcheck="false"
+                  />
+                  <div
+                    id="converter-source-zone-list"
+                    class="converter-zone-list hidden"
+                    role="listbox"
+                    aria-label="Source timezone options"
+                  >
+                  </div>
+                </div>
                 <p
                   id="converter-source-zone-name"
                   class="mt-1 text-xs font-mono text-muted-foreground dark:text-muted-foreground"
@@ -195,12 +206,23 @@ import '../styles/global.css';
               <article
                 class="rounded-xl border border-border dark:border-border bg-muted/60 dark:bg-muted/50 px-5 py-4"
               >
-                <select
-                  id="converter-target-zone"
-                  class="converter-zone-select text-3xl font-semibold text-card-foreground dark:text-card-foreground md:text-2xl"
-                  aria-label="Target city and country"
-                >
-                </select>
+                <div class="converter-zone-picker">
+                  <input
+                    id="converter-target-zone"
+                    type="text"
+                    class="converter-zone-input text-3xl font-semibold text-card-foreground dark:text-card-foreground md:text-2xl"
+                    aria-label="Target city and country"
+                    autocomplete="off"
+                    spellcheck="false"
+                  />
+                  <div
+                    id="converter-target-zone-list"
+                    class="converter-zone-list hidden"
+                    role="listbox"
+                    aria-label="Target timezone options"
+                  >
+                  </div>
+                </div>
                 <p
                   id="converter-target-zone-name"
                   class="mt-1 text-xs font-mono text-muted-foreground dark:text-muted-foreground"
