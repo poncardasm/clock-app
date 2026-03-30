@@ -6,7 +6,6 @@ import {
   getZonedDateTimeParts,
   isDaytime,
 } from './clock-time';
-import { initConverter, refreshConverterForFormatChange } from './converter';
 
 let is24Hour = true;
 
@@ -59,7 +58,6 @@ document.querySelectorAll('.time-format-btn').forEach((button) => {
     is24Hour = format === '24';
 
     updateClocks();
-    refreshConverterForFormatChange(is24Hour);
   });
 });
 
@@ -71,6 +69,5 @@ if (themeToggle) {
   });
 }
 
-initConverter(() => is24Hour);
 updateClocks();
 setInterval(updateClocks, 1000);
